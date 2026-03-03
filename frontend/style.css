@@ -243,10 +243,16 @@ main {
     flex-direction: column;
     gap: 1.5rem;
     transition: opacity 0.6s ease, visibility 0.6s ease;
+    /* Fallback: si nasconde da solo dopo 2.5s anche senza JS */
+    animation: loaderAutoHide 0.5s ease 2.5s forwards;
+}
+@keyframes loaderAutoHide {
+    to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
 #page-loader.hidden {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
 }
 .loader-logo {
     font-size: 1.4rem;

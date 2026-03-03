@@ -13,6 +13,21 @@
     <div class="loader-logo">Demo <span>Concessionaria</span></div>
     <div class="loader-bar"></div>
 </div>
+<script>
+// Rimuove il loader in modo garantito (~1.8s), indipendente da errori JS successivi
+(function(){
+    var loader = document.getElementById('page-loader');
+    if(!loader) return;
+    function hide(){
+        loader.style.opacity='0';
+        loader.style.pointerEvents='none';
+        loader.style.transition='opacity 0.5s ease';
+        setTimeout(function(){ loader.remove(); }, 600);
+    }
+    // Attende fine animazione barra (shimmer 1.2s + 0.3s delay) poi sfuma
+    setTimeout(hide, 1800);
+})();
+</script>
     <header>
         <div class="container">
             <a href="/" class="logo-link"><h1>Demo Concessionaria</h1></a>
@@ -633,6 +648,8 @@
     </footer>
 
     <script>
+        // Dichiarazione anticipata per uso in caricaVeicoli
+        var revealObserver;
         // ===== AUTENTICAZIONE =====
         function getAuthToken() {
             return localStorage.getItem('authToken');
@@ -657,8 +674,6 @@
         function aggiornaAuth() {
             const authBtn = document.getElementById('auth-btn');
             const btnAggiungi = document.getElementById('btn-aggiungi-veicolo');
-            const heroTitle = document.getElementById('hero-title');
-            const heroSubtitle = document.getElementById('hero-subtitle');
             
             if (isUserAdmin()) {
                 authBtn.textContent = 'Logout';
@@ -667,16 +682,12 @@
                     e.preventDefault();
                     logout();
                 };
-                btnAggiungi.style.display = 'inline-block';
-                heroTitle.textContent = 'Pannello Amministratore';
-                heroSubtitle.textContent = 'Gestisci i veicoli del concessionario';
+                if (btnAggiungi) btnAggiungi.style.display = 'inline-block';
             } else {
                 authBtn.textContent = 'Accesso Admin';
                 authBtn.href = '/login';
                 authBtn.onclick = null;
-                btnAggiungi.style.display = 'none';
-                heroTitle.textContent = 'Veicoli Disponibili';
-                heroSubtitle.textContent = 'Scopri la nostra selezione di auto';
+                if (btnAggiungi) btnAggiungi.style.display = 'none';
             }
         }
 
@@ -1365,24 +1376,6 @@
             });
         });
 
-        // ─── PAGE LOADER ─────────────────────────────────────────────
-        // Lo script è in fondo alla pagina: window.load può già essere scattato.
-        // Controlliamo readyState per gestire entrambi i casi.
-        function hidePageLoader() {
-            const loader = document.getElementById('page-loader');
-            if (!loader) return;
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                loader.style.transition = 'opacity 0.6s ease';
-                setTimeout(() => loader.remove(), 700);
-            }, 400);
-        }
-        if (document.readyState === 'complete') {
-            hidePageLoader();
-        } else {
-            window.addEventListener('load', hidePageLoader);
-        }
-
         // ─── HEADER SCROLL GLASS EFFECT ──────────────────────────────
         const header = document.querySelector('header');
         window.addEventListener('scroll', () => {
@@ -1390,7 +1383,7 @@
         }, { passive: true });
 
         // ─── SCROLL REVEAL (IntersectionObserver) ────────────────────
-        const revealObserver = new IntersectionObserver((entries) => {
+        revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
