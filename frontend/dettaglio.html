@@ -58,7 +58,6 @@
                 
                 const immagini = veicolo.immagini || [veicolo.immagine];
                 allImages = immagini; // Salva per il carousel
-                const hasMultipleImages = immagini.length > 1;
                 
                 container.innerHTML = `
                     <div class="dettaglio-content">
@@ -71,16 +70,36 @@
                         <div class="dettaglio-grid">
                             <div class="dettaglio-immagine">
                                 <div class="dettaglio-carousel">
-                                    <div class="dettaglio-carousel-main">
+                                    <div class="dettaglio-carousel-main" style="position:relative;">
                                         <img id="main-image" src="${immagini[0]}" alt="${veicolo.marca} ${veicolo.modello}">
-                                        ${hasMultipleImages ? `
-                                            <button class="carousel-btn prev" onclick="changeImage(-1)">‹</button>
-                                            <button class="carousel-btn next" onclick="changeImage(1)">›</button>
-                                            <div class="carousel-indicators">
-                                                ${immagini.map((_, i) => `<span class="carousel-indicator ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})"></span>`).join('')}
-                                            </div>
+                                        ${immagini.length > 1 ? `
+                                            <button class="carousel-btn prev" onclick="changeImage(-1)">&#8249;</button>
+                                            <button class="carousel-btn next" onclick="changeImage(1)">&#8250;</button>
                                         ` : ''}
+                                        <button class="gallery-fullscreen-btn" onclick="openFullscreen(currentImageIndex)" title="Schermo intero" aria-label="Apri immagine a schermo intero">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                <polyline points="9 21 3 21 3 15"></polyline>
+                                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                                            </svg>
+                                        </button>
                                     </div>
+                                    ${immagini.length > 1 ? `
+                                    <div class="dettaglio-thumbnails-wrapper" id="thumbs-wrapper">
+                                        <button class="thumb-arrow prev" onclick="scrollThumbs(-1)" id="thumb-prev">&#8249;</button>
+                                        <div class="dettaglio-thumbnails-viewport" id="thumbs-viewport">
+                                            <div class="dettaglio-thumbnails-track" id="thumbs-track">
+                                                ${immagini.map((img, i) => `
+                                                    <div class="thumbnail ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})" data-idx="${i}">
+                                                        <img src="${img}" alt="Foto ${i+1}">
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                        <button class="thumb-arrow next" onclick="scrollThumbs(1)" id="thumb-next">&#8250;</button>
+                                    </div>
+                                    ` : ''}
                                 </div>
                             </div>
                             
@@ -179,7 +198,10 @@
             }
         }
 
-        // Gestione Carousel Dettaglio
+        // Gestione Carousel + Thumbnails + Lightbox
+        const THUMBS_VISIBLE = 5;
+        let thumbOffset = 0; // quante thumbnail sono scrollate a sinistra
+
         function changeImage(direction) {
             currentImageIndex = (currentImageIndex + direction + allImages.length) % allImages.length;
             updateImage();
@@ -192,15 +214,89 @@
 
         function updateImage() {
             const mainImg = document.getElementById('main-image');
-            const dots = document.querySelectorAll('.carousel-indicator');
-            
             if (mainImg && allImages[currentImageIndex]) {
                 mainImg.src = allImages[currentImageIndex];
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === currentImageIndex);
-                });
+            }
+            // Aggiorna thumbnail attiva
+            document.querySelectorAll('.thumbnail').forEach((t, i) => {
+                t.classList.toggle('active', i === currentImageIndex);
+            });
+            centreThumbOnCurrent();
+            // Aggiorna lightbox se aperto
+            const lbImg = document.querySelector('#lightbox-modal .lightbox-content img');
+            if (lbImg) {
+                lbImg.src = allImages[currentImageIndex];
+                const counter = document.querySelector('#lightbox-modal .lightbox-counter');
+                if (counter) counter.textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
             }
         }
+
+        function scrollThumbs(dir) {
+            const track = document.getElementById('thumbs-track');
+            if (!track) return;
+            const total = allImages.length;
+            const maxOffset = Math.max(0, total - THUMBS_VISIBLE);
+            thumbOffset = Math.min(Math.max(thumbOffset + dir, 0), maxOffset);
+            const thumbWidth = track.querySelector('.thumbnail') ? track.querySelector('.thumbnail').offsetWidth + 8 : 100;
+            track.style.transform = 'translateX(-' + (thumbOffset * thumbWidth) + 'px)';
+        }
+
+        function centreThumbOnCurrent() {
+            const half = Math.floor(THUMBS_VISIBLE / 2);
+            const total = allImages.length;
+            const maxOffset = Math.max(0, total - THUMBS_VISIBLE);
+            thumbOffset = Math.min(Math.max(currentImageIndex - half, 0), maxOffset);
+            const track = document.getElementById('thumbs-track');
+            if (!track) return;
+            const thumbWidth = track.querySelector('.thumbnail') ? track.querySelector('.thumbnail').offsetWidth + 8 : 100;
+            track.style.transform = 'translateX(-' + (thumbOffset * thumbWidth) + 'px)';
+        }
+
+        function openFullscreen(index) {
+            currentImageIndex = index;
+            let modal = document.getElementById('lightbox-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'lightbox-modal';
+                modal.className = 'lightbox-overlay';
+                modal.innerHTML = `
+                    <button class="lightbox-close" onclick="closeFullscreen()" title="Chiudi">&#10005;</button>
+                    <button class="lightbox-nav prev" onclick="lightboxNav(-1)">&#8249;</button>
+                    <div class="lightbox-content"><img src="" alt=""></div>
+                    <button class="lightbox-nav next" onclick="lightboxNav(1)">&#8250;</button>
+                    <div class="lightbox-counter"></div>
+                `;
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) closeFullscreen();
+                });
+                document.body.appendChild(modal);
+            }
+            const img = modal.querySelector('.lightbox-content img');
+            img.src = allImages[currentImageIndex];
+            modal.querySelector('.lightbox-counter').textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFullscreen() {
+            const modal = document.getElementById('lightbox-modal');
+            if (modal) modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function lightboxNav(dir) {
+            currentImageIndex = (currentImageIndex + dir + allImages.length) % allImages.length;
+            updateImage();
+        }
+
+        // Navigazione tastiera
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('lightbox-modal');
+            const isOpen = modal && modal.style.display === 'flex';
+            if (e.key === 'Escape' && isOpen) { closeFullscreen(); return; }
+            if (e.key === 'ArrowLeft') { isOpen ? lightboxNav(-1) : changeImage(-1); }
+            if (e.key === 'ArrowRight') { isOpen ? lightboxNav(1) : changeImage(1); }
+        });
 
         // Carica i dettagli all'avvio
         caricaDettaglioVeicolo();
