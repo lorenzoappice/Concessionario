@@ -148,7 +148,7 @@ app.get('/api/veicoli', async (req, res) => {
   try {
     const {
       search, marca, prezzoMin, prezzoMax, annoMin, annoMax,
-      kmMin, kmMax, carburante, cambio,
+      kmMin, kmMax, carburante, cambio, condizione, tipo_veicolo,
       orderBy = 'id', orderDir = 'ASC',
       page = '1', limit = '9'
     } = req.query;
@@ -206,6 +206,16 @@ app.get('/api/veicoli', async (req, res) => {
     if (cambio) {
       whereText += ` AND LOWER(v.cambio) = LOWER($${paramCount})`;
       params.push(cambio);
+      paramCount++;
+    }
+    if (condizione) {
+      whereText += ` AND LOWER(v.condizione) = LOWER($${paramCount})`;
+      params.push(condizione);
+      paramCount++;
+    }
+    if (tipo_veicolo) {
+      whereText += ` AND LOWER(v.tipo_veicolo) = LOWER($${paramCount})`;
+      params.push(tipo_veicolo);
       paramCount++;
     }
 
@@ -380,8 +390,8 @@ app.post('/api/veicoli', authenticateToken, isAdmin, upload.array('immagini', 10
     // Inserisci veicolo
     const vehicleResult = await client.query(
       `INSERT INTO vehicles (marca, modello, anno, prezzo, chilometri, potenza, cilindrata, 
-       carburante, cambio, colore, porte, posti, carrozzeria, trazione, descrizione)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       carburante, cambio, colore, porte, posti, carrozzeria, trazione, descrizione, condizione, tipo_veicolo)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
        RETURNING *`,
       [
         req.body.marca, req.body.modello, parseInt(req.body.anno), 
@@ -389,7 +399,8 @@ app.post('/api/veicoli', authenticateToken, isAdmin, upload.array('immagini', 10
         req.body.potenza, req.body.cilindrata, req.body.carburante,
         req.body.cambio, req.body.colore, parseInt(req.body.porte),
         parseInt(req.body.posti), req.body.carrozzeria, req.body.trazione,
-        req.body.descrizione
+        req.body.descrizione,
+        req.body.condizione || 'Usato', req.body.tipo_veicolo || 'Auto'
       ]
     );
     
@@ -492,15 +503,17 @@ app.put('/api/veicoli/:id', authenticateToken, isAdmin, upload.array('immagini',
       `UPDATE vehicles SET 
        marca = $1, modello = $2, anno = $3, prezzo = $4, chilometri = $5, 
        potenza = $6, cilindrata = $7, carburante = $8, cambio = $9, colore = $10,
-       porte = $11, posti = $12, carrozzeria = $13, trazione = $14, descrizione = $15
-       WHERE id = $16`,
+       porte = $11, posti = $12, carrozzeria = $13, trazione = $14, descrizione = $15,
+       condizione = $16, tipo_veicolo = $17
+       WHERE id = $18`,
       [
         req.body.marca, req.body.modello, parseInt(req.body.anno), 
         parseFloat(req.body.prezzo), parseInt(req.body.chilometri),
         req.body.potenza, req.body.cilindrata, req.body.carburante,
         req.body.cambio, req.body.colore, parseInt(req.body.porte),
         parseInt(req.body.posti), req.body.carrozzeria, req.body.trazione,
-        req.body.descrizione, id
+        req.body.descrizione,
+        req.body.condizione || 'Usato', req.body.tipo_veicolo || 'Auto', id
       ]
     );
     
@@ -674,6 +687,8 @@ async function initDatabase() {
         carrozzeria VARCHAR(50),
         trazione VARCHAR(30),
         descrizione TEXT,
+        condizione VARCHAR(20) DEFAULT 'Usato',
+        tipo_veicolo VARCHAR(30) DEFAULT 'Auto',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -700,6 +715,10 @@ async function initDatabase() {
     `);
 
     // Crea indici
+    // Aggiunge colonne se non esistono (per DB già creati)
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS condizione VARCHAR(20) DEFAULT 'Usato'`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS tipo_veicolo VARCHAR(30) DEFAULT 'Auto'`);
+
     await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_marca ON vehicles(marca);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_prezzo ON vehicles(prezzo);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_anno ON vehicles(anno);`);
