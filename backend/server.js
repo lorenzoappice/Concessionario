@@ -52,6 +52,44 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
+// ==================== HEALTH CHECK ====================
+
+app.get('/api/health', async (req, res) => {
+  const info = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    env: {
+      DATABASE_URL: process.env.DATABASE_URL ? '✓ impostato' : '✗ mancante',
+      DB_HOST: process.env.DB_HOST || '✗ mancante',
+      DB_NAME: process.env.DB_NAME || '✗ mancante',
+      DB_USER: process.env.DB_USER || '✗ mancante',
+      DB_PASSWORD: process.env.DB_PASSWORD ? '✓ impostato' : '✗ mancante',
+      DB_SSL: process.env.DB_SSL || '✗ mancante',
+      JWT_SECRET: process.env.JWT_SECRET ? '✓ impostato' : '✗ mancante',
+      PORT: process.env.PORT || '3000 (default)',
+    },
+    db: null,
+    error: null
+  };
+
+  try {
+    const result = await query('SELECT NOW() as time, current_database() as db');
+    const tablesResult = await query(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name`);
+    info.db = {
+      connected: true,
+      serverTime: result.rows[0].time,
+      database: result.rows[0].db,
+      tables: tablesResult.rows.map(r => r.table_name)
+    };
+  } catch (err) {
+    info.status = 'error';
+    info.error = err.message;
+    info.db = { connected: false };
+  }
+
+  res.json(info);
+});
+
 // ==================== AUTH ROUTES ====================
 
 // Route per login admin con JWT
@@ -213,7 +251,7 @@ app.get('/api/veicoli', async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Errore recupero veicoli:', error);
-    res.status(500).json({ error: 'Errore nel recupero dei veicoli' });
+    res.status(500).json({ error: 'Errore nel recupero dei veicoli', detail: error.message });
   }
 });
 
