@@ -1366,16 +1366,22 @@
         });
 
         // ─── PAGE LOADER ─────────────────────────────────────────────
-        window.addEventListener('load', () => {
+        // Lo script è in fondo alla pagina: window.load può già essere scattato.
+        // Controlliamo readyState per gestire entrambi i casi.
+        function hidePageLoader() {
             const loader = document.getElementById('page-loader');
-            if (loader) {
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    loader.style.transition = 'opacity 0.6s ease';
-                    setTimeout(() => loader.remove(), 700);
-                }, 600);
-            }
-        });
+            if (!loader) return;
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.6s ease';
+                setTimeout(() => loader.remove(), 700);
+            }, 400);
+        }
+        if (document.readyState === 'complete') {
+            hidePageLoader();
+        } else {
+            window.addEventListener('load', hidePageLoader);
+        }
 
         // ─── HEADER SCROLL GLASS EFFECT ──────────────────────────────
         const header = document.querySelector('header');
