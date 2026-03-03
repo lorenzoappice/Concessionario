@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Page Loader -->
+<div id="page-loader">
+    <div class="loader-logo">Demo <span>Concessionaria</span></div>
+    <div class="loader-bar"></div>
+</div>
     <header>
         <div class="container">
             <a href="/" class="logo-link"><h1>Demo Concessionaria</h1></a>
@@ -21,19 +27,64 @@
         </div>
     </header>
 
-    <main class="container">
-        <section class="hero">
-            <h2 id="hero-title">Veicoli Disponibili</h2>
-            <p id="hero-subtitle">Scopri la nostra selezione di auto</p>
-            <button id="btn-aggiungi-veicolo" class="btn-admin-action" style="display: none;">
-                ➕ Aggiungi Veicolo
-            </button>
-        </section>
+    <!-- Hero (fuori dal container per larghezza piena) -->
+    <section class="hero">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-bg-gradient"></div>
+        <span class="hero-eyebrow">Benvenuto nella nostra concessionaria</span>
+        <h2>Veicoli <em>d'Eccellenza</em></h2>
+        <p id="hero-subtitle">Scopri la nostra selezione premium di auto nuove e usate</p>
+        <div class="hero-cta-group">
+            <a href="#veicoli-section" class="hero-btn-primary">Esplora i Veicoli</a>
+            <a href="/contatti" class="hero-btn-secondary">Contattaci</a>
+        </div>
+        <div class="hero-scroll-indicator">
+            <span>Scorri</span>
+            <div class="hero-scroll-line"></div>
+        </div>
+        <button id="btn-aggiungi-veicolo" class="btn-admin-action" style="display: none; position: absolute; top: 2rem; right: 2rem; z-index: 10;">
+            ➕ Aggiungi Veicolo
+        </button>
+    </section>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-number" data-target="0" id="stat-veicoli">0</span>
+            <span class="stat-label">Veicoli Disponibili</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="15">0</span>
+            <span class="stat-label">Marche</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="98">0</span>
+            <span class="stat-label">Clienti Soddisfatti %</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="10">0</span>
+            <span class="stat-label">Anni di Esperienza</span>
+        </div>
+    </div>
+
+    <!-- Brand Ticker -->
+    <div class="brand-ticker" aria-hidden="true">
+        <div class="brand-ticker-track">
+            <span>BMW</span><span>Mercedes</span><span>Audi</span><span>Volkswagen</span>
+            <span>Porsche</span><span>Ferrari</span><span>Lamborghini</span><span>Maserati</span>
+            <span>Tesla</span><span>Alfa Romeo</span><span>Fiat</span><span>Lancia</span>
+            <span>BMW</span><span>Mercedes</span><span>Audi</span><span>Volkswagen</span>
+            <span>Porsche</span><span>Ferrari</span><span>Lamborghini</span><span>Maserati</span>
+            <span>Tesla</span><span>Alfa Romeo</span><span>Fiat</span><span>Lancia</span>
+        </div>
+    </div>
+
+    <main class="container" id="veicoli-section">
 
         <!-- Sezione Filtri -->
-        <section class="filtri-section">
+        <section class="filtri-section reveal">
             <div class="filtri-header">
-                <h3 id="toggle-filtri" style="cursor: pointer; user-select: none;">
+                <h3 id="toggle-filtri" class="section-heading" style="cursor: pointer; user-select: none;">
                     Filtra Veicoli 
                     <span id="filtri-icon" style="font-size: 0.8em; margin-left: 10px;">▼</span>
                 </h3>
@@ -977,9 +1028,10 @@
                     const hasMultipleImages = immagini.length > 1;
                     const isSelected = veicoliSelezionati.includes(veicolo.id);
                     const isAdmin = isUserAdmin();
+                    const delayClass = `reveal-delay-${(index % 4) + 1}`;
                     
                     return `
-                    <div class="veicolo-card-link">
+                    <div class="veicolo-card-link reveal ${delayClass}">
                         <div class="veicolo-card ${isSelected ? 'selected' : ''}" data-veicolo-id="${veicolo.id}">
                             <div class="confronto-checkbox">
                                 <input type="checkbox" 
@@ -1031,6 +1083,19 @@
                 
                 // Inizializza i carousel
                 initCarousels();
+                // Animazioni scroll reveal sulle card appena renderizzate
+                document.querySelectorAll('.veicolo-card-link.reveal').forEach(el => {
+                    el.classList.remove('visible');
+                    if (typeof revealObserver !== 'undefined') revealObserver.observe(el);
+                });
+                // Aggiorna counter stat veicoli con il totale reale
+                const statEl = document.getElementById('stat-veicoli');
+                if (statEl && data.total) {
+                    statEl.dataset.target = data.total;
+                    if (statEl.closest('.stats-bar') && statEl.closest('.stats-bar').classList.contains('counted')) {
+                        statEl.textContent = data.total;
+                    }
+                }
                 // Aggiorna paginazione
                 renderPaginazione(data.page || 1, data.totalPages || 1);
             } catch (error) {
@@ -1298,6 +1363,185 @@
                 document.getElementById('main-nav').classList.remove('open');
                 document.getElementById('hamburger').classList.remove('active');
             });
+        });
+
+        // ─── PAGE LOADER ─────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    loader.style.transition = 'opacity 0.6s ease';
+                    setTimeout(() => loader.remove(), 700);
+                }, 600);
+            }
+        });
+
+        // ─── HEADER SCROLL GLASS EFFECT ──────────────────────────────
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (header) header.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        // ─── SCROLL REVEAL (IntersectionObserver) ────────────────────
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObserver.observe(el));
+
+        // ─── COUNTER ANIMATION ───────────────────────────────────────
+        function animateCounter(el) {
+            const target = parseInt(el.dataset.target, 10);
+            if (isNaN(target)) return;
+            const duration = 1800;
+            const step = 16;
+            const increment = target / (duration / step);
+            let current = 0;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    el.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    el.textContent = Math.floor(current);
+                }
+            }, step);
+        }
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-number[data-target]').forEach(el => counterObserver.observe(el));
+
+        // ─── CANVAS PARTICLES ────────────────────────────────────────
+        (function initParticles() {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+
+            const N = 55;
+            const particles = Array.from({ length: N }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.8 + 0.5,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                alpha: Math.random() * 0.5 + 0.15
+            }));
+
+            function draw() {
+                if (!canvas.width || !canvas.height) { requestAnimationFrame(draw); return; }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw connections
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(201,169,97,${0.12 * (1 - dist / 130)})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                    // Draw particle
+                    const p = particles[i];
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201,169,97,${p.alpha})`;
+                    ctx.fill();
+
+                    // Move
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ─── TYPING EFFECT (hero subtitle) ───────────────────────────
+        (function initTyping() {
+            const el = document.getElementById('hero-subtitle');
+            if (!el) return;
+            const phrases = [
+                'Scopri la nostra selezione premium di auto nuove e usate',
+                'Qualità, affidabilità e passione per i motori',
+                'Trova il veicolo dei tuoi sogni al miglior prezzo'
+            ];
+            let pi = 0, ci = 0, deleting = false;
+            el.textContent = '';
+
+            function type() {
+                const phrase = phrases[pi];
+                if (!deleting) {
+                    el.textContent = phrase.slice(0, ci + 1);
+                    ci++;
+                    if (ci === phrase.length) {
+                        deleting = true;
+                        setTimeout(type, 2200);
+                        return;
+                    }
+                } else {
+                    el.textContent = phrase.slice(0, ci - 1);
+                    ci--;
+                    if (ci === 0) {
+                        deleting = false;
+                        pi = (pi + 1) % phrases.length;
+                    }
+                }
+                setTimeout(type, deleting ? 38 : 58);
+            }
+            setTimeout(type, 1200);
+        })();
+
+        // ─── RIPPLE EFFECT ───────────────────────────────────────────
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.hero-btn-primary, .hero-btn-secondary, .btn-admin-action, .pagination-btn');
+            if (!btn) return;
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+            btn.style.position = 'relative';
+            btn.style.overflow = 'hidden';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
+        });
+
+        // ─── REVEAL CLASSES ON STATIC ELEMENTS ───────────────────────
+        document.querySelectorAll('.filtri-section').forEach((el, i) => {
+            el.classList.add('reveal');
+            el.classList.add(`reveal-delay-${(i % 4) + 1}`);
+            revealObserver.observe(el);
         });
     </script>
 </body>
