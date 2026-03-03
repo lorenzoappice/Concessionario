@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -231,201 +231,253 @@
     </main>
 
     <!-- Modal Aggiungi Veicolo -->
+    <!-- Modal Aggiungi Veicolo -->
     <div id="modal-aggiungi" class="modal">
         <div class="modal-content">
+            <div class="modal-accent-line"></div>
             <div class="modal-header">
-                <h2>Aggiungi Nuovo Veicolo</h2>
-                <span class="modal-close" onclick="chiudiModal('modal-aggiungi')">&times;</span>
+                <div class="modal-header-left">
+                    <span class="modal-eyebrow">Pannello Admin</span>
+                    <h2>Aggiungi Veicolo</h2>
+                </div>
+                <button class="modal-close-btn" onclick="chiudiModal('modal-aggiungi')" aria-label="Chiudi">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
+
+            <div class="modal-tabs" id="tabs-aggiungi">
+                <button class="modal-tab active" onclick="switchTab(this,'aggiungi','base')">
+                    <span class="tab-num">01</span><span class="tab-label">Dati Base</span>
+                </button>
+                <button class="modal-tab" onclick="switchTab(this,'aggiungi','motore')">
+                    <span class="tab-num">02</span><span class="tab-label">Motore</span>
+                </button>
+                <button class="modal-tab" onclick="switchTab(this,'aggiungi','extra')">
+                    <span class="tab-num">03</span><span class="tab-label">Extra</span>
+                </button>
+                <button class="modal-tab" onclick="switchTab(this,'aggiungi','foto')">
+                    <span class="tab-num">04</span><span class="tab-label">Foto</span>
+                </button>
+            </div>
+
             <form id="form-aggiungi" class="vehicle-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Marca *</label>
-                        <input type="text" name="marca" required>
+
+                <!-- TAB 1: DATI BASE -->
+                <div class="form-tab active" data-modal="aggiungi" data-tab="base">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marca <span class="req">*</span></label>
+                            <input type="text" name="marca" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Modello <span class="req">*</span></label>
+                            <input type="text" name="modello" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Modello *</label>
-                        <input type="text" name="modello" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Anno <span class="req">*</span></label>
+                            <input type="number" name="anno" required min="1900" max="2030">
+                        </div>
+                        <div class="form-group">
+                            <label>Prezzo (€) <span class="req">*</span></label>
+                            <input type="number" name="prezzo" required min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Chilometri <span class="req">*</span></label>
+                            <input type="number" name="chilometri" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Colore <span class="req">*</span></label>
+                            <input type="text" name="colore" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Condizione <span class="req">*</span></label>
+                            <select name="condizione" required>
+                                <option value="Usato">Usato</option>
+                                <option value="Nuovo">Nuovo</option>
+                                <option value="Km0">Km0</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo Veicolo <span class="req">*</span></label>
+                            <select name="tipo_veicolo" required>
+                                <option value="Auto">Auto</option>
+                                <option value="Scooter">Scooter</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Carrozzeria <span class="req">*</span></label>
+                            <select name="carrozzeria" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Berlina">Berlina</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Coupé">Coupé</option>
+                                <option value="Cabrio">Cabrio</option>
+                                <option value="Station Wagon">Station Wagon</option>
+                                <option value="Monovolume">Monovolume</option>
+                                <option value="Sportiva">Sportiva</option>
+                                <option value="Crossover">Crossover</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trazione <span class="req">*</span></label>
+                            <select name="trazione" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Anteriore">Anteriore</option>
+                                <option value="Posteriore">Posteriore</option>
+                                <option value="Integrale">Integrale</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Porte <span class="req">*</span></label>
+                            <input type="number" name="porte" required min="2" max="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Posti <span class="req">*</span></label>
+                            <input type="number" name="posti" required min="2" max="9">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Anno *</label>
-                        <input type="number" name="anno" required min="1900" max="2030">
+                <!-- TAB 2: MOTORE -->
+                <div class="form-tab" data-modal="aggiungi" data-tab="motore">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Potenza (CV) <span class="req">*</span></label>
+                            <input type="text" name="potenza" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cilindrata (cc) <span class="req">*</span></label>
+                            <input type="text" name="cilindrata" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Prezzo (€) *</label>
-                        <input type="number" name="prezzo" required min="0">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Carburante <span class="req">*</span></label>
+                            <select name="carburante" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Benzina">Benzina</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Elettrica">Elettrica</option>
+                                <option value="Ibrida">Ibrida</option>
+                                <option value="GPL">GPL</option>
+                                <option value="Metano">Metano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cambio <span class="req">*</span></label>
+                            <select name="cambio" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Manuale">Manuale</option>
+                                <option value="Automatico">Automatico</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Chilometri *</label>
-                        <input type="number" name="chilometri" required min="0">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marce</label>
+                            <input type="number" name="marce" min="1" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Cilindri</label>
+                            <input type="number" name="cilindri" min="1" max="16">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Potenza (CV) *</label>
-                        <input type="text" name="potenza" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Peso a Vuoto (kg)</label>
+                            <input type="number" name="peso_vuoto" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Classe Emissioni</label>
+                            <select name="classe_emissioni">
+                                <option value="">Seleziona...</option>
+                                <option value="Euro 6">Euro 6</option>
+                                <option value="Euro 5">Euro 5</option>
+                                <option value="Euro 4">Euro 4</option>
+                                <option value="Euro 3">Euro 3</option>
+                                <option value="Euro 2">Euro 2</option>
+                                <option value="Elettrico">Elettrico (0 emissioni)</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Cilindrata (cc) *</label>
-                        <input type="text" name="cilindrata" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Carburante *</label>
-                        <select name="carburante" required>
-                            <option value="">Seleziona...</option>
-                            <option value="Benzina">Benzina</option>
-                            <option value="Diesel">Diesel</option>
-                            <option value="Elettrica">Elettrica</option>
-                            <option value="Ibrida">Ibrida</option>
-                            <option value="GPL">GPL</option>
-                            <option value="Metano">Metano</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Cambio *</label>
-                        <select name="cambio" required>
-                            <option value="">Seleziona...</option>
-                            <option value="Manuale">Manuale</option>
-                            <option value="Automatico">Automatico</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Colore *</label>
-                        <input type="text" name="colore" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Porte *</label>
-                        <input type="number" name="porte" required min="2" max="5">
-                    </div>
-                    <div class="form-group">
-                        <label>Posti *</label>
-                        <input type="number" name="posti" required min="2" max="9">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Carrozzeria *</label>
-                        <input type="text" name="carrozzeria" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Trazione *</label>
-                        <input type="text" name="trazione" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Consumi</label>
+                            <input type="text" name="consumi" placeholder="es. 6.5 L/100km">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Condizione *</label>
-                        <select name="condizione" required>
-                            <option value="Usato">Usato</option>
-                            <option value="Nuovo">Nuovo</option>
-                            <option value="Km0">Km0</option>
-                        </select>
+                <!-- TAB 3: EXTRA -->
+                <div class="form-tab" data-modal="aggiungi" data-tab="extra">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Garanzia</label>
+                            <input type="text" name="garanzia" placeholder="es. 12 mesi">
+                        </div>
+                        <div class="form-group">
+                            <label>Neopatentati</label>
+                            <select name="neopatentati">
+                                <option value="No">No</option>
+                                <option value="Sì">Sì</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ultimo Tagliando</label>
+                            <input type="text" name="ultimo_tagliando" placeholder="es. 2024">
+                        </div>
+                        <div class="form-group">
+                            <label>N° Proprietari</label>
+                            <input type="number" name="proprietari" min="0" value="0">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Tipo Veicolo *</label>
-                        <select name="tipo_veicolo" required>
-                            <option value="Auto">Auto</option>
-                            <option value="Scooter">Scooter</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Garanzia</label>
-                        <input type="text" name="garanzia" placeholder="es. 12 mesi">
+                        <label>Descrizione <span class="req">*</span></label>
+                        <textarea name="descrizione" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Neopatentati</label>
-                        <select name="neopatentati">
-                            <option value="No">No</option>
-                            <option value="Sì">Sì</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Ultimo Tagliando</label>
-                        <input type="text" name="ultimo_tagliando" placeholder="es. 2024">
-                    </div>
-                    <div class="form-group">
-                        <label>N° Proprietari</label>
-                        <input type="number" name="proprietari" min="0" value="0">
+                        <label>Optional <small style="font-weight:300;text-transform:none;letter-spacing:0">(uno per riga)</small></label>
+                        <textarea name="optional" rows="4" placeholder="ABS&#10;Airbag&#10;Bluetooth..."></textarea>
                     </div>
                 </div>
 
-                <div class="form-row">
+                <!-- TAB 4: FOTO -->
+                <div class="form-tab" data-modal="aggiungi" data-tab="foto">
                     <div class="form-group">
-                        <label>Marce</label>
-                        <input type="number" name="marce" min="1" max="10">
-                    </div>
-                    <div class="form-group">
-                        <label>Cilindri</label>
-                        <input type="number" name="cilindri" min="1" max="16">
+                        <label>Immagini <span class="req">*</span> <small style="font-weight:300;text-transform:none;letter-spacing:0">(max 10)</small></label>
+                        <input type="file" name="immagini" multiple accept="image/*" onchange="previewImages(event, 'preview-aggiungi')">
+                        <div id="preview-aggiungi" class="image-preview"></div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Peso a Vuoto (kg)</label>
-                        <input type="number" name="peso_vuoto" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Classe Emissioni</label>
-                        <select name="classe_emissioni">
-                            <option value="">Seleziona...</option>
-                            <option value="Euro 6">Euro 6</option>
-                            <option value="Euro 5">Euro 5</option>
-                            <option value="Euro 4">Euro 4</option>
-                            <option value="Euro 3">Euro 3</option>
-                            <option value="Euro 2">Euro 2</option>
-                            <option value="Elettrico">Elettrico (0 emissioni)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Consumi</label>
-                        <input type="text" name="consumi" placeholder="es. 6.5 L/100km">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Descrizione *</label>
-                    <textarea name="descrizione" rows="4" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Optional (uno per riga)</label>
-                    <textarea name="optional" rows="4" placeholder="ABS&#10;Airbag&#10;Bluetooth..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Immagini (max 10) *</label>
-                    <input type="file" name="immagini" multiple accept="image/*" onchange="previewImages(event, 'preview-aggiungi')">
-                    <div id="preview-aggiungi" class="image-preview"></div>
-                </div>
-
+                <!-- AZIONI -->
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="chiudiModal('modal-aggiungi')">Annulla</button>
-                    <button type="submit" class="btn-primary">Aggiungi Veicolo</button>
+                    <button type="button" class="modal-btn-nav modal-btn-prev" onclick="prevTab('aggiungi')" style="display:none">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        Indietro
+                    </button>
+                    <div style="display:flex;gap:1rem;margin-left:auto">
+                        <button type="button" class="btn-secondary" onclick="chiudiModal('modal-aggiungi')">Annulla</button>
+                        <button type="button" class="modal-btn-nav modal-btn-next" onclick="nextTab('aggiungi')">
+                            Avanti
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                        <button type="submit" class="btn-primary modal-btn-submit" style="display:none">
+                            ✓ Aggiungi Veicolo
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -434,212 +486,261 @@
     <!-- Modal Modifica Veicolo -->
     <div id="modal-modifica" class="modal">
         <div class="modal-content">
+            <div class="modal-accent-line"></div>
             <div class="modal-header">
-                <h2>Modifica Veicolo</h2>
-                <span class="modal-close" onclick="chiudiModal('modal-modifica')">&times;</span>
+                <div class="modal-header-left">
+                    <span class="modal-eyebrow">Pannello Admin</span>
+                    <h2>Modifica Veicolo</h2>
+                </div>
+                <button class="modal-close-btn" onclick="chiudiModal('modal-modifica')" aria-label="Chiudi">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
+
+            <div class="modal-tabs" id="tabs-modifica">
+                <button class="modal-tab active" onclick="switchTab(this,'modifica','base')">
+                    <span class="tab-num">01</span><span class="tab-label">Dati Base</span>
+                </button>
+                <button class="modal-tab" onclick="switchTab(this,'modifica','motore')">
+                    <span class="tab-num">02</span><span class="tab-label">Motore</span>
+                </button>
+                <button class="modal-tab" onclick="switchTab(this,'modifica','extra')">
+                    <span class="tab-num">03</span><span class="tab-label">Extra</span>
+                </button>
+                <button class="modal-tab" onclick="switchTab(this,'modifica','foto')">
+                    <span class="tab-num">04</span><span class="tab-label">Foto</span>
+                </button>
+            </div>
+
             <form id="form-modifica" class="vehicle-form">
                 <input type="hidden" name="id" id="modifica-id">
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Marca *</label>
-                        <input type="text" name="marca" id="modifica-marca" required>
+
+                <!-- TAB 1: DATI BASE -->
+                <div class="form-tab active" data-modal="modifica" data-tab="base">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marca <span class="req">*</span></label>
+                            <input type="text" name="marca" id="modifica-marca" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Modello <span class="req">*</span></label>
+                            <input type="text" name="modello" id="modifica-modello" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Modello *</label>
-                        <input type="text" name="modello" id="modifica-modello" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Anno <span class="req">*</span></label>
+                            <input type="number" name="anno" id="modifica-anno" required min="1900" max="2030">
+                        </div>
+                        <div class="form-group">
+                            <label>Prezzo (€) <span class="req">*</span></label>
+                            <input type="number" name="prezzo" id="modifica-prezzo" required min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Chilometri <span class="req">*</span></label>
+                            <input type="number" name="chilometri" id="modifica-chilometri" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Colore <span class="req">*</span></label>
+                            <input type="text" name="colore" id="modifica-colore" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Condizione <span class="req">*</span></label>
+                            <select name="condizione" id="modifica-condizione" required>
+                                <option value="Usato">Usato</option>
+                                <option value="Nuovo">Nuovo</option>
+                                <option value="Km0">Km0</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo Veicolo <span class="req">*</span></label>
+                            <select name="tipo_veicolo" id="modifica-tipo_veicolo" required>
+                                <option value="Auto">Auto</option>
+                                <option value="Scooter">Scooter</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Carrozzeria <span class="req">*</span></label>
+                            <select name="carrozzeria" id="modifica-carrozzeria" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Berlina">Berlina</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Coupé">Coupé</option>
+                                <option value="Cabrio">Cabrio</option>
+                                <option value="Station Wagon">Station Wagon</option>
+                                <option value="Monovolume">Monovolume</option>
+                                <option value="Sportiva">Sportiva</option>
+                                <option value="Crossover">Crossover</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Trazione <span class="req">*</span></label>
+                            <select name="trazione" id="modifica-trazione" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Anteriore">Anteriore</option>
+                                <option value="Posteriore">Posteriore</option>
+                                <option value="Integrale">Integrale</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Porte <span class="req">*</span></label>
+                            <input type="number" name="porte" id="modifica-porte" required min="2" max="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Posti <span class="req">*</span></label>
+                            <input type="number" name="posti" id="modifica-posti" required min="2" max="9">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Anno *</label>
-                        <input type="number" name="anno" id="modifica-anno" required min="1900" max="2030">
+                <!-- TAB 2: MOTORE -->
+                <div class="form-tab" data-modal="modifica" data-tab="motore">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Potenza (CV) <span class="req">*</span></label>
+                            <input type="text" name="potenza" id="modifica-potenza" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cilindrata (cc) <span class="req">*</span></label>
+                            <input type="text" name="cilindrata" id="modifica-cilindrata" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Prezzo (€) *</label>
-                        <input type="number" name="prezzo" id="modifica-prezzo" required min="0">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Carburante <span class="req">*</span></label>
+                            <select name="carburante" id="modifica-carburante" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Benzina">Benzina</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Elettrica">Elettrica</option>
+                                <option value="Ibrida">Ibrida</option>
+                                <option value="GPL">GPL</option>
+                                <option value="Metano">Metano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cambio <span class="req">*</span></label>
+                            <select name="cambio" id="modifica-cambio" required>
+                                <option value="">Seleziona...</option>
+                                <option value="Manuale">Manuale</option>
+                                <option value="Automatico">Automatico</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Chilometri *</label>
-                        <input type="number" name="chilometri" id="modifica-chilometri" required min="0">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Marce</label>
+                            <input type="number" name="marce" id="modifica-marce" min="1" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Cilindri</label>
+                            <input type="number" name="cilindri" id="modifica-cilindri" min="1" max="16">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Potenza (CV) *</label>
-                        <input type="text" name="potenza" id="modifica-potenza" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Peso a Vuoto (kg)</label>
+                            <input type="number" name="peso_vuoto" id="modifica-peso_vuoto" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Classe Emissioni</label>
+                            <select name="classe_emissioni" id="modifica-classe_emissioni">
+                                <option value="">Seleziona...</option>
+                                <option value="Euro 6">Euro 6</option>
+                                <option value="Euro 5">Euro 5</option>
+                                <option value="Euro 4">Euro 4</option>
+                                <option value="Euro 3">Euro 3</option>
+                                <option value="Euro 2">Euro 2</option>
+                                <option value="Elettrico">Elettrico (0 emissioni)</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Cilindrata (cc) *</label>
-                        <input type="text" name="cilindrata" id="modifica-cilindrata" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Carburante *</label>
-                        <select name="carburante" id="modifica-carburante" required>
-                            <option value="">Seleziona...</option>
-                            <option value="Benzina">Benzina</option>
-                            <option value="Diesel">Diesel</option>
-                            <option value="Elettrica">Elettrica</option>
-                            <option value="Ibrida">Ibrida</option>
-                            <option value="GPL">GPL</option>
-                            <option value="Metano">Metano</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Cambio *</label>
-                        <select name="cambio" id="modifica-cambio" required>
-                            <option value="">Seleziona...</option>
-                            <option value="Manuale">Manuale</option>
-                            <option value="Automatico">Automatico</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Colore *</label>
-                        <input type="text" name="colore" id="modifica-colore" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Porte *</label>
-                        <input type="number" name="porte" id="modifica-porte" required min="2" max="5">
-                    </div>
-                    <div class="form-group">
-                        <label>Posti *</label>
-                        <input type="number" name="posti" id="modifica-posti" required min="2" max="9">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Carrozzeria *</label>
-                        <input type="text" name="carrozzeria" id="modifica-carrozzeria" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Trazione *</label>
-                        <input type="text" name="trazione" id="modifica-trazione" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Consumi</label>
+                            <input type="text" name="consumi" id="modifica-consumi" placeholder="es. 6.5 L/100km">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Condizione *</label>
-                        <select name="condizione" id="modifica-condizione" required>
-                            <option value="Usato">Usato</option>
-                            <option value="Nuovo">Nuovo</option>
-                            <option value="Km0">Km0</option>
-                        </select>
+                <!-- TAB 3: EXTRA -->
+                <div class="form-tab" data-modal="modifica" data-tab="extra">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Garanzia</label>
+                            <input type="text" name="garanzia" id="modifica-garanzia" placeholder="es. 12 mesi">
+                        </div>
+                        <div class="form-group">
+                            <label>Neopatentati</label>
+                            <select name="neopatentati" id="modifica-neopatentati">
+                                <option value="No">No</option>
+                                <option value="Sì">Sì</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ultimo Tagliando</label>
+                            <input type="text" name="ultimo_tagliando" id="modifica-ultimo_tagliando" placeholder="es. 2024">
+                        </div>
+                        <div class="form-group">
+                            <label>N° Proprietari</label>
+                            <input type="number" name="proprietari" id="modifica-proprietari" min="0" value="0">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Tipo Veicolo *</label>
-                        <select name="tipo_veicolo" id="modifica-tipo_veicolo" required>
-                            <option value="Auto">Auto</option>
-                            <option value="Scooter">Scooter</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Garanzia</label>
-                        <input type="text" name="garanzia" id="modifica-garanzia" placeholder="es. 12 mesi">
+                        <label>Descrizione <span class="req">*</span></label>
+                        <textarea name="descrizione" id="modifica-descrizione" rows="4" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Neopatentati</label>
-                        <select name="neopatentati" id="modifica-neopatentati">
-                            <option value="No">No</option>
-                            <option value="Sì">Sì</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Ultimo Tagliando</label>
-                        <input type="text" name="ultimo_tagliando" id="modifica-ultimo_tagliando" placeholder="es. 2024">
-                    </div>
-                    <div class="form-group">
-                        <label>N° Proprietari</label>
-                        <input type="number" name="proprietari" id="modifica-proprietari" min="0" value="0">
+                        <label>Optional <small style="font-weight:300;text-transform:none;letter-spacing:0">(uno per riga)</small></label>
+                        <textarea name="optional" id="modifica-optional" rows="4" placeholder="ABS&#10;Airbag&#10;Bluetooth..."></textarea>
                     </div>
                 </div>
 
-                <div class="form-row">
+                <!-- TAB 4: FOTO -->
+                <div class="form-tab" data-modal="modifica" data-tab="foto">
                     <div class="form-group">
-                        <label>Marce</label>
-                        <input type="number" name="marce" id="modifica-marce" min="1" max="10">
+                        <label>Immagini Esistenti</label>
+                        <div id="immagini-esistenti" class="existing-images"></div>
                     </div>
                     <div class="form-group">
-                        <label>Cilindri</label>
-                        <input type="number" name="cilindri" id="modifica-cilindri" min="1" max="16">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Peso a Vuoto (kg)</label>
-                        <input type="number" name="peso_vuoto" id="modifica-peso_vuoto" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Classe Emissioni</label>
-                        <select name="classe_emissioni" id="modifica-classe_emissioni">
-                            <option value="">Seleziona...</option>
-                            <option value="Euro 6">Euro 6</option>
-                            <option value="Euro 5">Euro 5</option>
-                            <option value="Euro 4">Euro 4</option>
-                            <option value="Euro 3">Euro 3</option>
-                            <option value="Euro 2">Euro 2</option>
-                            <option value="Elettrico">Elettrico (0 emissioni)</option>
-                        </select>
+                        <label>Aggiungi Nuove Immagini</label>
+                        <input type="file" name="immagini" id="modifica-immagini" multiple accept="image/*" onchange="previewImages(event, 'preview-modifica')">
+                        <div id="preview-modifica" class="image-preview"></div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Consumi</label>
-                        <input type="text" name="consumi" id="modifica-consumi" placeholder="es. 6.5 L/100km">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Descrizione *</label>
-                    <textarea name="descrizione" id="modifica-descrizione" rows="4" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Optional (uno per riga)</label>
-                    <textarea name="optional" id="modifica-optional" rows="4" placeholder="ABS&#10;Airbag&#10;Bluetooth..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Immagini Esistenti</label>
-                    <div id="immagini-esistenti" class="existing-images"></div>
-                </div>
-
-                <div class="form-group">
-                    <label>Aggiungi Nuove Immagini</label>
-                    <input type="file" name="immagini" id="modifica-immagini" multiple accept="image/*" onchange="previewImages(event, 'preview-modifica')">
-                    <div id="preview-modifica" class="image-preview"></div>
-                </div>
-
+                <!-- AZIONI -->
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="chiudiModal('modal-modifica')">Annulla</button>
-                    <button type="submit" class="btn-primary">Salva Modifiche</button>
+                    <button type="button" class="modal-btn-nav modal-btn-prev" onclick="prevTab('modifica')" style="display:none">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        Indietro
+                    </button>
+                    <div style="display:flex;gap:1rem;margin-left:auto">
+                        <button type="button" class="btn-secondary" onclick="chiudiModal('modal-modifica')">Annulla</button>
+                        <button type="button" class="modal-btn-nav modal-btn-next" onclick="nextTab('modifica')">
+                            Avanti
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                        <button type="submit" class="btn-primary modal-btn-submit" style="display:none">
+                            ✓ Salva Modifiche
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
-
     <!-- fine modali -->
+
 
     <footer>
         <div class="container">
@@ -691,10 +792,66 @@
             }
         }
 
+        // ===== MODAL TABS =====
+        function switchTab(tabBtn, modalId, tabName) {
+            // aggiorna tab attivo
+            document.querySelectorAll('#tabs-' + modalId + ' .modal-tab')
+                .forEach(function(t) { t.classList.remove('active'); });
+            tabBtn.classList.add('active');
+            // aggiorna pannello attivo
+            document.querySelectorAll('.form-tab[data-modal="' + modalId + '"]')
+                .forEach(function(p) { p.classList.remove('active'); });
+            var panel = document.querySelector('.form-tab[data-modal="' + modalId + '"][data-tab="' + tabName + '"]');
+            if (panel) panel.classList.add('active');
+            updateTabButtons(modalId);
+        }
+
+        function nextTab(modalId) {
+            var tabs = Array.from(document.querySelectorAll('#tabs-' + modalId + ' .modal-tab'));
+            var idx = tabs.findIndex(function(t) { return t.classList.contains('active'); });
+            if (idx < tabs.length - 1) tabs[idx + 1].click();
+        }
+
+        function prevTab(modalId) {
+            var tabs = Array.from(document.querySelectorAll('#tabs-' + modalId + ' .modal-tab'));
+            var idx = tabs.findIndex(function(t) { return t.classList.contains('active'); });
+            if (idx > 0) tabs[idx - 1].click();
+        }
+
+        function updateTabButtons(modalId) {
+            var tabs = Array.from(document.querySelectorAll('#tabs-' + modalId + ' .modal-tab'));
+            var idx = tabs.findIndex(function(t) { return t.classList.contains('active'); });
+            var form = document.getElementById('form-' + modalId);
+            if (!form) return;
+            var prevBtn   = form.querySelector('.modal-btn-prev');
+            var nextBtn   = form.querySelector('.modal-btn-next');
+            var submitBtn = form.querySelector('.modal-btn-submit');
+            var isLast = idx === tabs.length - 1;
+            if (prevBtn)   prevBtn.style.display   = idx === 0 ? 'none' : 'flex';
+            if (nextBtn)   nextBtn.style.display   = isLast   ? 'none' : 'flex';
+            if (submitBtn) submitBtn.style.display = isLast   ? 'inline-flex' : 'none';
+        }
+
+        function resetModalTabs(modalId) {
+            var tabs = Array.from(document.querySelectorAll('#tabs-' + modalId + ' .modal-tab'));
+            if (!tabs.length) return;
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            tabs[0].classList.add('active');
+            document.querySelectorAll('.form-tab[data-modal="' + modalId + '"]')
+                .forEach(function(p) { p.classList.remove('active'); });
+            var firstTabName = tabs[0].getAttribute('onclick').match(/'([^']+)'\)$/);
+            if (firstTabName) {
+                var panel = document.querySelector('.form-tab[data-modal="' + modalId + '"][data-tab="' + firstTabName[1] + '"]');
+                if (panel) panel.classList.add('active');
+            }
+            updateTabButtons(modalId);
+        }
+
         // ===== GESTIONE MODAL =====
         function apriModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
             document.body.style.overflow = 'hidden';
+            resetModalTabs(modalId);
         }
 
         function chiudiModal(modalId) {
