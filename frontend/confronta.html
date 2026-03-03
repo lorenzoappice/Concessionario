@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confronto Veicoli - Pasquale Grandolfo Concessionario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Pasquale Grandolfo Concessionario</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/login" class="btn-admin">Accesso Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="confronto-wrapper">
+            <div class="confronto-header">
+                <button onclick="window.history.back()" class="btn-back">← Torna Indietro</button>
+                <h2>Confronto Veicoli</h2>
+            </div>
+
+            <div id="confronto-container">
+                <div class="loading">Caricamento confronto...</div>
+            </div>
+
+            <div class="confronto-azioni">
+                <button onclick="window.location.href='/'" class="btn-primary">Torna alla Home</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Concessionario Auto di Pasquale Grandolfo. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function caricaConfronto() {
+            try {
+                // Ottieni gli ID dalla query string
+                const urlParams = new URLSearchParams(window.location.search);
+                const idsString = urlParams.get('ids');
+                
+                if (!idsString) {
+                    throw new Error('Nessun veicolo selezionato per il confronto');
+                }
+                
+                const ids = idsString.split(',').map(id => parseInt(id));
+                
+                if (ids.length < 2) {
+                    throw new Error('Seleziona almeno 2 veicoli per il confronto');
+                }
+                
+                if (ids.length > 3) {
+                    throw new Error('Puoi confrontare massimo 3 veicoli');
+                }
+                
+                // Richiesta al backend
+                const response = await fetch('http://localhost:3000/api/veicoli/confronta', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ ids })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Errore nel recupero dei veicoli');
+                }
+                
+                const veicoli = await response.json();
+                
+                if (veicoli.length === 0) {
+                    throw new Error('Nessun veicolo trovato');
+                }
+                
+                renderConfronto(veicoli);
+            } catch (error) {
+                console.error('Errore confronto:', error);
+                document.getElementById('confronto-container').innerHTML = `
+                    <div class="error-container">
+                        <p class="error">⚠️ ${error.message}</p>
+                        <button onclick="window.history.back()" class="btn-retry">Torna Indietro</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderConfronto(veicoli) {
+            const container = document.getElementById('confronto-container');
+            
+            const campi = [
+                { label: 'Immagine', key: 'immagini', render: v => `<img src="${v.immagini[0]}" alt="${v.marca} ${v.modello}">` },
+                { label: 'Marca', key: 'marca' },
+                { label: 'Modello', key: 'modello' },
+                { label: 'Prezzo', key: 'prezzo', render: v => `<span class="confronto-prezzo">€ ${v.prezzo.toLocaleString()}</span>` },
+                { label: 'Anno', key: 'anno' },
+                { label: 'Chilometri', key: 'chilometri', render: v => `${v.chilometri.toLocaleString()} km` },
+                { label: 'Potenza', key: 'potenza', render: v => `${v.potenza} CV` },
+                { label: 'Cilindrata', key: 'cilindrata', render: v => `${v.cilindrata} cc` },
+                { label: 'Carburante', key: 'carburante' },
+                { label: 'Cambio', key: 'cambio' },
+                { label: 'Colore', key: 'colore' },
+                { label: 'Porte', key: 'porte' },
+                { label: 'Posti', key: 'posti' },
+                { label: 'Carrozzeria', key: 'carrozzeria' },
+                { label: 'Trazione', key: 'trazione' }
+            ];
+            
+            let tableHTML = `
+                <div class="confronto-table-wrapper">
+                    <table class="confronto-table">
+                        <thead>
+                            <tr>
+                                <th>Caratteristica</th>
+                                ${veicoli.map(v => `<th>${v.marca} ${v.modello}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            campi.forEach(campo => {
+                tableHTML += `
+                    <tr>
+                        <td class="label-cell">${campo.label}</td>
+                        ${veicoli.map(v => {
+                            const value = campo.render ? campo.render(v) : v[campo.key];
+                            return `<td>${value !== null && value !== undefined ? value : '-'}</td>`;
+                        }).join('')}
+                    </tr>
+                `;
+            });
+            
+            // Descrizione
+            tableHTML += `
+                <tr>
+                    <td class="label-cell">Descrizione</td>
+                    ${veicoli.map(v => `<td style="text-align: left; max-width: 300px;">${v.descrizione || '-'}</td>`).join('')}
+                </tr>
+            `;
+            
+            // Optional
+            tableHTML += `
+                <tr>
+                    <td class="label-cell">Optional</td>
+                    ${veicoli.map(v => {
+                        if (v.optional && v.optional.length > 0) {
+                            return `<td style="text-align: left;">
+                                <ul style="list-style: none; padding: 0;">
+                                    ${v.optional.map(opt => `<li style="padding: 0.3rem 0;">✓ ${opt}</li>`).join('')}
+                                </ul>
+                            </td>`;
+                        }
+                        return `<td>-</td>`;
+                    }).join('')}
+                </tr>
+            `;
+            
+            // Azioni
+            tableHTML += `
+                <tr>
+                    <td class="label-cell">Azioni</td>
+                    ${veicoli.map(v => `
+                        <td>
+                            <button onclick="window.location.href='/dettaglio.html?id=${v.id}'" class="btn-view">
+                                Vedi Dettagli
+                            </button>
+                        </td>
+                    `).join('')}
+                </tr>
+            `;
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+
+        // Carica confronto all'avvio
+        caricaConfronto();
+    </script>
+</body>
+</html>

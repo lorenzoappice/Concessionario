@@ -1,0 +1,126 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "admin123"
+  },
+  "veicoli": [
+    {
+      "id": 1,
+      "marca": "Ferrari",
+      "modello": "F8 Tributo",
+      "anno": 2023,
+      "prezzo": 275000,
+      "chilometri": 1500,
+      "immagini": [
+        "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800",
+        "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800",
+        "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800"
+      ],
+      "descrizione": "Splendida Ferrari F8 Tributo in condizioni impeccabili. Questo capolavoro di ingegneria italiana offre prestazioni mozzafiato con il suo motore V8 biturbo. Equipaggiata con tutti gli optional di serie e mantenuta in modo impeccabile. Unico proprietario, libretto tagliandi completo.",
+      "carburante": "Benzina",
+      "cambio": "Automatico",
+      "colore": "Rosso Corsa",
+      "porte": 2,
+      "potenza": 720,
+      "cilindrata": 3902,
+      "trazione": "Posteriore",
+      "posti": 2,
+      "carrozzeria": "Coupé",
+      "optional": [
+        "Cerchi in lega 20",
+        "Sistema audio premium",
+        "Sedili sportivi in carbonio",
+        "Navigatore satellitare",
+        "Telecamere 360°",
+        "Freni carboceramici"
+      ]
+    },
+    {
+      "id": 2,
+      "marca": "Lamborghini",
+      "modello": "Huracán",
+      "anno": 2022,
+      "prezzo": 230000,
+      "chilometri": 3200,
+      "immagini": [
+        "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
+        "https://images.unsplash.com/photo-1621135802920-133df287f89c?w=800",
+        "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=800"
+      ],
+      "descrizione": "Lamborghini Huracán EVO in perfette condizioni. Design aggressivo e prestazioni da supercar pura. Motore V10 aspirato che emoziona ad ogni accelerazione. Interni in pelle e Alcantara, ogni dettaglio curato. Certificata e con garanzia estesa disponibile.",
+      "carburante": "Benzina",
+      "cambio": "Automatico",
+      "colore": "Verde Mantis",
+      "porte": 2,
+      "potenza": 640,
+      "cilindrata": 5204,
+      "trazione": "Integrale",
+      "posti": 2,
+      "carrozzeria": "Coupé",
+      "optional": [
+        "Cerchi in lega forgiati",
+        "Sistema di scarico sportivo",
+        "Sedili racing",
+        "Cruise control adattivo",
+        "Sistema audio Bang & Olufsen",
+        "Lift anteriore"
+      ]
+    },
+    {
+      "id": 3,
+      "marca": "Porsche",
+      "modello": "911 Turbo S",
+      "anno": 2024,
+      "prezzo": 210000,
+      "chilometri": 500,
+      "immagini": [
+        "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
+        "https://images.unsplash.com/photo-1611821064430-4e10099cb528?w=800",
+        "https://images.unsplash.com/photo-1580274455191-1c62238fa333?w=800"
+      ],
+      "descrizione": "Nuovissima Porsche 911 Turbo S, praticamente km 0. La perfetta combinazione di lusso, comfort e prestazioni estreme. Tecnologia all'avanguardia e finiture di altissimo livello. Questo esemplare rappresenta l'eccellenza della casa di Stoccarda.",
+      "carburante": "Benzina",
+      "cambio": "Automatico PDK",
+      "colore": "Nero Metallizzato",
+      "porte": 2,
+      "potenza": 650,
+      "cilindrata": 3745,
+      "trazione": "Integrale",
+      "posti": 4,
+      "carrozzeria": "Coupé",
+      "optional": [
+        "Pacchetto Sport Chrono",
+        "Asse posteriore sterzante",
+        "PASM Sport",
+        "Sistema Burmester High-End",
+        "Vetri Privacy",
+        "Sport Design Package"
+      ]
+    },
+    {
+      "id": 5,
+      "marca": "dadad",
+      "modello": "adwadwad",
+      "anno": 2022,
+      "prezzo": 1111,
+      "chilometri": 1111,
+      "potenza": 11,
+      "cilindrata": 1111,
+      "carburante": "Diesel",
+      "cambio": "Automatico",
+      "colore": "Nera",
+      "carrozzeria": "Berlina",
+      "trazione": "Anteriore",
+      "porte": 3,
+      "posti": 2,
+      "descrizione": "dadwadadaw",
+      "immagini": [
+        "/uploads/1772529334218-747968858.jpg",
+        "/uploads/1772529334218-511329604.jpg"
+      ],
+      "optional": [
+        "adwdadd"
+      ]
+    }
+  ]
+}

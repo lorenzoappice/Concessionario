@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Concessionario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏎️ Concessionario Auto di Lusso</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/contatti">Contattaci</a>
+                <a href="/login" class="btn-admin active">Accesso Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="login-container">
+            <h2>Accesso Amministratore</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Accedi</button>
+                <div id="message" class="message"></div>
+            </form>
+            <div class="demo-credentials">
+                <p><strong>Credenziali demo:</strong></p>
+                <p>Username: admin</p>
+                <p>Password: admin123</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Concessionario Auto di Lusso. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = 'Login effettuato! Reindirizzamento...';
+                    
+                    // Salva il token JWT e info utente
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userInfo', JSON.stringify(data.user));
+                    
+                    // Reindirizza alla homepage (invece di /admin)
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = data.message || 'Credenziali non valide';
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Errore di connessione. Assicurati che il server sia avviato.';
+                console.error('Errore:', error);
+            }
+        });
+    </script>
+</body>
+</html>

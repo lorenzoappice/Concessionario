@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio Veicolo - Concessionario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏎️ Concessionario Auto di Lusso</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/contatti">Contattaci</a>
+                <a href="/login" class="btn-admin" id="auth-btn">Accesso Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="dettaglio-container" class="dettaglio-wrapper">
+            <div class="loading">Caricamento dettagli...</div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Concessionario Auto di Lusso. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentImageIndex = 0;
+        let allImages = [];
+        
+        async function caricaDettaglioVeicolo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idVeicolo = urlParams.get('id');
+            
+            if (!idVeicolo) {
+                window.location.href = '/';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:3000/api/veicoli/${idVeicolo}`);
+                
+                if (!response.ok) {
+                    throw new Error('Veicolo non trovato');
+                }
+                
+                const veicolo = await response.json();
+                const container = document.getElementById('dettaglio-container');
+                
+                const immagini = veicolo.immagini || [veicolo.immagine];
+                allImages = immagini; // Salva per il carousel
+                const hasMultipleImages = immagini.length > 1;
+                
+                container.innerHTML = `
+                    <div class="dettaglio-content">
+                        <div class="dettaglio-header">
+                            <button onclick="window.location.href='/'" class="btn-back">← Torna alla lista</button>
+                            <h2>${veicolo.marca} ${veicolo.modello}</h2>
+                            <p class="prezzo-principale">€ ${veicolo.prezzo.toLocaleString()}</p>
+                        </div>
+                        
+                        <div class="dettaglio-grid">
+                            <div class="dettaglio-immagine">
+                                <div class="dettaglio-carousel">
+                                    <div class="dettaglio-carousel-main">
+                                        <img id="main-image" src="${immagini[0]}" alt="${veicolo.marca} ${veicolo.modello}">
+                                        ${hasMultipleImages ? `
+                                            <button class="carousel-btn prev" onclick="changeImage(-1)">‹</button>
+                                            <button class="carousel-btn next" onclick="changeImage(1)">›</button>
+                                            <div class="carousel-indicators">
+                                                ${immagini.map((_, i) => `<span class="carousel-indicator ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})"></span>`).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="dettaglio-info-principale">
+                                <div class="info-card">
+                                    <h3>Caratteristiche Principali</h3>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <span class="info-label">Anno</span>
+                                            <span class="info-value">${veicolo.anno}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Chilometri</span>
+                                            <span class="info-value">${veicolo.chilometri.toLocaleString()} km</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Carburante</span>
+                                            <span class="info-value">${veicolo.carburante}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Cambio</span>
+                                            <span class="info-value">${veicolo.cambio}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Colore</span>
+                                            <span class="info-value">${veicolo.colore}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Porte</span>
+                                            <span class="info-value">${veicolo.porte}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Potenza</span>
+                                            <span class="info-value">${veicolo.potenza} CV</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Cilindrata</span>
+                                            <span class="info-value">${veicolo.cilindrata} cc</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Trazione</span>
+                                            <span class="info-value">${veicolo.trazione}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Posti</span>
+                                            <span class="info-value">${veicolo.posti}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Carrozzeria</span>
+                                            <span class="info-value">${veicolo.carrozzeria}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="dettaglio-descrizione">
+                            <div class="info-card">
+                                <h3>Descrizione</h3>
+                                <p>${veicolo.descrizione}</p>
+                            </div>
+                        </div>
+                        
+                        ${veicolo.optional && veicolo.optional.length > 0 ? `
+                        <div class="dettaglio-optional">
+                            <div class="info-card">
+                                <h3>Optional e Accessori</h3>
+                                <ul class="optional-list">
+                                    ${veicolo.optional.map(opt => `<li>✓ ${opt}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="dettaglio-azioni">
+                            <button class="btn-contatta">📞 Contattaci per info</button>
+                            <button class="btn-prenota">📅 Prenota test drive</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Event listeners per i bottoni
+                document.querySelector('.btn-contatta').addEventListener('click', () => {
+                    alert('Per informazioni contattaci al: +39 02 1234567');
+                });
+                
+                document.querySelector('.btn-prenota').addEventListener('click', () => {
+                    alert('Per prenotare un test drive contattaci al: +39 02 1234567');
+                });
+                
+            } catch (error) {
+                console.error('Errore nel caricamento del veicolo:', error);
+                document.getElementById('dettaglio-container').innerHTML = 
+                    '<div class="error">Veicolo non trovato o errore nel caricamento.</div>' +
+                    '<button onclick="window.location.href=\'/\'" class="btn-back">← Torna alla lista</button>';
+            }
+        }
+
+        // Gestione Carousel Dettaglio
+        function changeImage(direction) {
+            currentImageIndex = (currentImageIndex + direction + allImages.length) % allImages.length;
+            updateImage();
+        }
+
+        function goToImage(index) {
+            currentImageIndex = index;
+            updateImage();
+        }
+
+        function updateImage() {
+            const mainImg = document.getElementById('main-image');
+            const dots = document.querySelectorAll('.carousel-indicator');
+            
+            if (mainImg && allImages[currentImageIndex]) {
+                mainImg.src = allImages[currentImageIndex];
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentImageIndex);
+                });
+            }
+        }
+
+        // Carica i dettagli all'avvio
+        caricaDettaglioVeicolo();
+
+        // Auth navbar
+        (function() {
+            const token = localStorage.getItem('authToken');
+            const userInfo = localStorage.getItem('userInfo');
+            const info = userInfo ? JSON.parse(userInfo) : null;
+            const authBtn = document.getElementById('auth-btn');
+            if (token && info && info.role === 'admin') {
+                authBtn.textContent = 'Logout';
+                authBtn.href = '#';
+                authBtn.onclick = (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userInfo');
+                    window.location.reload();
+                };
+            }
+        })();
+    </script>
+</body>
+</html>

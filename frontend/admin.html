@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannello Admin - Concessionario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏎️ Pannello Amministratore</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="#" id="logout-btn" class="btn-admin">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="admin-section">
+            <h2>Aggiungi Nuovo Veicolo</h2>
+            <form id="add-veicolo-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="marca">Marca *</label>
+                        <input type="text" id="marca" name="marca" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modello">Modello *</label>
+                        <input type="text" id="modello" name="modello" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="anno">Anno *</label>
+                        <input type="number" id="anno" name="anno" min="1900" max="2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prezzo">Prezzo (€) *</label>
+                        <input type="number" id="prezzo" name="prezzo" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="chilometri">Chilometri *</label>
+                        <input type="number" id="chilometri" name="chilometri" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="potenza">Potenza (CV) *</label>
+                        <input type="number" id="potenza" name="potenza" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cilindrata">Cilindrata (cc) *</label>
+                        <input type="number" id="cilindrata" name="cilindrata" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="carburante">Carburante *</label>
+                        <select id="carburante" name="carburante" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Benzina">Benzina</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Elettrico">Elettrico</option>
+                            <option value="Ibrido">Ibrido</option>
+                            <option value="GPL">GPL</option>
+                            <option value="Metano">Metano</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cambio">Cambio *</label>
+                        <select id="cambio" name="cambio" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Manuale">Manuale</option>
+                            <option value="Automatico">Automatico</option>
+                            <option value="Automatico PDK">Automatico PDK</option>
+                            <option value="Sequenziale">Sequenziale</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="colore">Colore *</label>
+                        <input type="text" id="colore" name="colore" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carrozzeria">Carrozzeria *</label>
+                        <select id="carrozzeria" name="carrozzeria" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Berlina">Berlina</option>
+                            <option value="Station Wagon">Station Wagon</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Coupé">Coupé</option>
+                            <option value="Cabrio">Cabrio</option>
+                            <option value="Monovolume">Monovolume</option>
+                            <option value="Sportiva">Sportiva</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="trazione">Trazione *</label>
+                        <select id="trazione" name="trazione" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Anteriore">Anteriore</option>
+                            <option value="Posteriore">Posteriore</option>
+                            <option value="Integrale">Integrale</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="porte">Numero Porte *</label>
+                        <input type="number" id="porte" name="porte" min="2" max="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="posti">Numero Posti *</label>
+                        <input type="number" id="posti" name="posti" min="2" max="9" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="immagini">Immagini Veicolo * (max 10 immagini)</label>
+                    <input type="file" id="immagini" name="immagini" accept="image/*" multiple required>
+                    <div id="image-preview" class="image-preview-container"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="descrizione">Descrizione *</label>
+                    <textarea id="descrizione" name="descrizione" rows="4" required placeholder="Inserisci una descrizione dettagliata del veicolo..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="optional">Optional (uno per riga)</label>
+                    <textarea id="optional" name="optional" rows="4" placeholder="Sistema audio premium&#10;Navigatore satellitare&#10;Cerchi in lega..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">Aggiungi Veicolo</button>
+                <div id="message" class="message"></div>
+            </form>
+        </section>
+
+        <section class="admin-section">
+            <h2>Veicoli Esistenti</h2>
+            <div class="veicoli-list" id="veicoli-admin-list">
+                <div class="loading">Caricamento veicoli...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Concessionario Auto di Lusso. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Funzione per ottenere il token JWT
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        // Funzione per verificare autenticazione
+        async function verificaAutenticazione() {
+            const token = getAuthToken();
+            
+            if (!token) {
+                window.location.href = '/login';
+                return false;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    // Token non valido o scaduto
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userInfo');
+                    window.location.href = '/login';
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Errore verifica autenticazione:', error);
+                return false;
+            }
+        }
+
+        // Verifica autenticazione all'avvio
+        verificaAutenticazione();
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userInfo');
+            window.location.href = '/';
+        });
+
+        // Preview immagini selezionate
+        document.getElementById('immagini').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('image-preview');
+            previewContainer.innerHTML = '';
+            
+            const files = Array.from(e.target.files);
+            
+            if (files.length > 10) {
+                alert('Massimo 10 immagini permesse');
+                e.target.value = '';
+                return;
+            }
+            
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgWrapper = document.createElement('div');
+                    imgWrapper.className = 'preview-image';
+                    imgWrapper.innerHTML = `
+                        <img src="${event.target.result}" alt="Preview ${index + 1}">
+                        <span class="preview-label">Foto ${index + 1}</span>
+                    `;
+                    previewContainer.appendChild(imgWrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Carica veicoli esistenti
+        async function caricaVeicoliAdmin() {
+            try {
+                const response = await fetch('http://localhost:3000/api/veicoli');
+                const veicoli = await response.json();
+                
+                const container = document.getElementById('veicoli-admin-list');
+                
+                if (veicoli.length === 0) {
+                    container.innerHTML = '<p class="no-veicoli">Nessun veicolo disponibile.</p>';
+                    return;
+                }
+                
+                container.innerHTML = veicoli.map(veicolo => {
+                    const primaImmagine = veicolo.immagini?.[0] || veicolo.immagine || '/placeholder.jpg';
+                    return `
+                    <div class="veicolo-admin-item">
+                        <img src="${primaImmagine}" alt="${veicolo.marca} ${veicolo.modello}">
+                        <div class="veicolo-details">
+                            <h3>${veicolo.marca} ${veicolo.modello}</h3>
+                            <p><strong>Anno:</strong> ${veicolo.anno} | <strong>Km:</strong> ${veicolo.chilometri.toLocaleString()} | <strong>Prezzo:</strong> €${veicolo.prezzo.toLocaleString()}</p>
+                            <p><strong>Potenza:</strong> ${veicolo.potenza} CV | <strong>Carburante:</strong> ${veicolo.carburante} | <strong>Cambio:</strong> ${veicolo.cambio}</p>
+                            <p class="image-count">📷 ${veicolo.immagini?.length || 1} immagini</p>
+                        </div>
+                        <div class="admin-actions">
+                            <button class="btn-view" onclick="window.open('/dettaglio.html?id=${veicolo.id}', '_blank')">👁️ Vedi</button>
+                            <button class="btn-delete" onclick="eliminaVeicolo(${veicolo.id})">🗑️ Elimina</button>
+                        </div>
+                    </div>
+                `}).join('');
+            } catch (error) {
+                console.error('Errore nel caricamento dei veicoli:', error);
+                document.getElementById('veicoli-admin-list').innerHTML = 
+                    '<p class="error">Errore nel caricamento dei veicoli.</p>';
+            }
+        }
+
+        // Aggiungi veicolo
+        document.getElementById('add-veicolo-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('message');
+            
+            // Gestione optional (array da textarea)
+            const optionalText = document.getElementById('optional').value;
+            const optionalArray = optionalText 
+                ? optionalText.split('\n').filter(line => line.trim() !== '')
+                : [];
+            
+            // Crea FormData per gestire file upload
+            const formData = new FormData();
+            formData.append('marca', document.getElementById('marca').value);
+            formData.append('modello', document.getElementById('modello').value);
+            formData.append('anno', document.getElementById('anno').value);
+            formData.append('prezzo', document.getElementById('prezzo').value);
+            formData.append('chilometri', document.getElementById('chilometri').value);
+            formData.append('potenza', document.getElementById('potenza').value);
+            formData.append('cilindrata', document.getElementById('cilindrata').value);
+            formData.append('carburante', document.getElementById('carburante').value);
+            formData.append('cambio', document.getElementById('cambio').value);
+            formData.append('colore', document.getElementById('colore').value);
+            formData.append('carrozzeria', document.getElementById('carrozzeria').value);
+            formData.append('trazione', document.getElementById('trazione').value);
+            formData.append('porte', document.getElementById('porte').value);
+            formData.append('posti', document.getElementById('posti').value);
+            formData.append('descrizione', document.getElementById('descrizione').value);
+            formData.append('optional', JSON.stringify(optionalArray));
+            
+            // Aggiungi le immagini
+            const immaginiInput = document.getElementById('immagini');
+            if (immaginiInput.files.length === 0) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Seleziona almeno un\'immagine';
+                return;
+            }
+            
+            for (let i = 0; i < immaginiInput.files.length; i++) {
+                formData.append('immagini', immaginiInput.files[i]);
+            }
+            
+            try {
+                const token = getAuthToken();
+                const response = await fetch('http://localhost:3000/api/veicoli', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = '✓ Veicolo aggiunto con successo!';
+                    
+                    // Reset form
+                    document.getElementById('add-veicolo-form').reset();
+                    document.getElementById('image-preview').innerHTML = '';
+                    
+                    // Ricarica lista veicoli
+                    caricaVeicoliAdmin();
+                    
+                    // Scroll to top per vedere il messaggio
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Nascondi messaggio dopo 5 secondi
+                    setTimeout(() => {
+                        messageDiv.textContent = '';
+                        messageDiv.className = 'message';
+                    }, 5000);
+                } else {
+                    messageDiv.className = 'message error';
+                    let errorMessage = data.error || 'Errore nell\'aggiunta del veicolo';
+                    if (data.campiMancanti) {
+                        errorMessage += ': ' + data.campiMancanti.join(', ');
+                    }
+                    if (data.details) {
+                        errorMessage += ' - ' + data.details;
+                    }
+                    messageDiv.textContent = '✗ ' + errorMessage;
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '✗ Errore di connessione al server. Verifica che il server sia avviato.';
+                console.error('Errore:', error);
+            }
+        });
+
+        // Elimina veicolo
+        async function eliminaVeicolo(id) {
+            if (!confirm('Sei sicuro di voler eliminare questo veicolo?')) {
+                return;
+            }
+            
+            try {
+                const token = getAuthToken();
+                const response = await fetch(`http://localhost:3000/api/veicoli/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    caricaVeicoliAdmin();
+                } else {
+                    alert('Errore nell\'eliminazione del veicolo');
+                }
+            } catch (error) {
+                alert('Errore di connessione');
+                console.error('Errore:', error);
+            }
+        }
+
+        // Carica i veicoli all'avvio
+        caricaVeicoliAdmin();
+    </script>
+</body>
+</html>

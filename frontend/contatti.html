@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contattaci - Pasquale Grandolfo Concessionario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Pasquale Grandolfo Concessionario</h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/contatti" class="active">Contattaci</a>
+                <a href="/login" class="btn-admin" id="auth-btn">Accesso Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="contatti-section" id="contatti">
+            <div class="container">
+                <h2 class="section-title">Dove Siamo</h2>
+                <div class="contatti-grid">
+                    <div class="contatti-info">
+                        <div class="contatti-card">
+                            <div class="contatto-item">
+                                <span class="contatto-icon">📍</span>
+                                <div>
+                                    <span class="contatto-label">Indirizzo</span>
+                                    <span class="contatto-value">Via Porto Torres, 95<br>70026 Modugno – Bari (BA)</span>
+                                </div>
+                            </div>
+                            <div class="contatto-item">
+                                <span class="contatto-icon">📞</span>
+                                <div>
+                                    <span class="contatto-label">Telefono</span>
+                                    <a href="tel:+390801234567" class="contatto-value contatto-link">+39 080 123 4567</a>
+                                </div>
+                            </div>
+                            <div class="contatto-item">
+                                <span class="contatto-icon">📱</span>
+                                <div>
+                                    <span class="contatto-label">WhatsApp</span>
+                                    <a href="https://wa.me/390801234567" target="_blank" class="contatto-value contatto-link">+39 080 123 4567</a>
+                                </div>
+                            </div>
+                            <div class="contatto-item">
+                                <span class="contatto-icon">✉️</span>
+                                <div>
+                                    <span class="contatto-label">Email</span>
+                                    <a href="mailto:info@concessionario.it" class="contatto-value contatto-link">info@concessionario.it</a>
+                                </div>
+                            </div>
+                            <div class="contatto-item">
+                                <span class="contatto-icon">🕐</span>
+                                <div>
+                                    <span class="contatto-label">Orari</span>
+                                    <span class="contatto-value">Lun – Sab: 9:00 – 19:00<br>Domenica: Chiuso</span>
+                                </div>
+                            </div>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Via+Porto+Torres,+95,+70026+Modugno+BA" target="_blank" class="btn-maps">
+                                🗺️ Apri in Google Maps
+                            </a>
+                        </div>
+                    </div>
+                    <div class="contatti-mappa">
+                        <iframe
+                            src="https://maps.google.com/maps?q=Via+Porto+Torres,+95,+70026+Modugno+BA,+Italy&output=embed&z=16"
+                            width="100%"
+                            height="100%"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Mappa Concessionario">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Concessionario Auto di Pasquale Grandolfo. Tutti i diritti riservati.</p>
+        </div>
+    </footer>
+
+    <script>
+        function getAuthToken() {
+            return localStorage.getItem('authToken');
+        }
+
+        function getUserInfo() {
+            const userInfo = localStorage.getItem('userInfo');
+            return userInfo ? JSON.parse(userInfo) : null;
+        }
+
+        function isUserAdmin() {
+            const userInfo = getUserInfo();
+            return userInfo && userInfo.role === 'admin' && getAuthToken();
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userInfo');
+            window.location.reload();
+        }
+
+        function aggiornaAuth() {
+            const authBtn = document.getElementById('auth-btn');
+            if (isUserAdmin()) {
+                authBtn.textContent = 'Logout';
+                authBtn.href = '#';
+                authBtn.onclick = (e) => {
+                    e.preventDefault();
+                    logout();
+                };
+            } else {
+                authBtn.textContent = 'Accesso Admin';
+                authBtn.href = '/login';
+                authBtn.onclick = null;
+            }
+        }
+
+        aggiornaAuth();
+    </script>
+</body>
+</html>
