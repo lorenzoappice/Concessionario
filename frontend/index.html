@@ -139,6 +139,8 @@
         <section class="veicoli-grid" id="veicoli-container">
             <div class="loading">Caricamento veicoli...</div>
         </section>
+
+        <div id="paginazione" class="paginazione-container"></div>
     </main>
 
     <!-- Modal Aggiungi Veicolo -->
@@ -729,10 +731,12 @@
         }
 
         // ===== CARICAMENTO VEICOLI E FILTRI =====
-        // State per confronto veicoli
+        // State
         let veicoliSelezionati = [];
+        let paginaCorrente = 1;
+        const VEICOLI_PER_PAGINA = 9;
 
-        async function caricaVeicoli(filtri = {}) {
+        async function caricaVeicoli(filtri = {}, pagina = 1) {
             try {
                 // Costruisci query string per filtri
                 const queryParams = new URLSearchParams();
@@ -749,6 +753,8 @@
                 if (filtri.cambio) queryParams.append('cambio', filtri.cambio);
                 if (filtri.orderBy) queryParams.append('orderBy', filtri.orderBy);
                 if (filtri.orderDir) queryParams.append('orderDir', filtri.orderDir);
+                queryParams.append('page', pagina);
+                queryParams.append('limit', VEICOLI_PER_PAGINA);
                 
                 const url = `/api/veicoli?${queryParams.toString()}`;
                 const response = await fetch(url);
@@ -757,12 +763,13 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const veicoli = await response.json();
+                const data = await response.json();
+                const veicoliRicevuti = data.veicoli || [];
                 
                 const container = document.getElementById('veicoli-container');
                 
                 // Filtra veicoli validi (con tutti i campi necessari)
-                const veicoliValidi = veicoli.filter(v => 
+                const veicoliValidi = veicoliRicevuti.filter(v => 
                     v.marca && v.modello && v.anno && v.prezzo && 
                     v.chilometri !== undefined && v.potenza && 
                     (v.immagini?.length > 0 || v.immagine)
@@ -828,6 +835,8 @@
                 
                 // Inizializza i carousel
                 initCarousels();
+                // Aggiorna paginazione
+                renderPaginazione(data.page || 1, data.totalPages || 1);
             } catch (error) {
                 console.error('Errore nel caricamento dei veicoli:', error);
                 document.getElementById('veicoli-container').innerHTML = 
@@ -880,6 +889,71 @@
             indicators.forEach((indicator, index) => {
                 indicator.classList.toggle('active', index === activeIndex);
             });
+        }
+
+        // ===== PAGINAZIONE =====
+        function renderPaginazione(paginaAttuale, totalePagine) {
+            const container = document.getElementById('paginazione');
+            if (!container) return;
+            if (totalePagine <= 1) { container.innerHTML = ''; return; }
+
+            let html = '';
+
+            // Precedente
+            html += `<button class="pag-btn" onclick="cambiaPagina(${paginaAttuale - 1})" ${paginaAttuale === 1 ? 'disabled' : ''}>&lsaquo; Prec</button>`;
+
+            // Range numeri con ellissi
+            const range = [];
+            if (totalePagine <= 7) {
+                for (let i = 1; i <= totalePagine; i++) range.push(i);
+            } else {
+                range.push(1);
+                if (paginaAttuale > 3) range.push('...');
+                for (let i = Math.max(2, paginaAttuale - 1); i <= Math.min(totalePagine - 1, paginaAttuale + 1); i++) range.push(i);
+                if (paginaAttuale < totalePagine - 2) range.push('...');
+                range.push(totalePagine);
+            }
+
+            range.forEach(item => {
+                if (item === '...') {
+                    html += `<span class="pag-ellipsis">&hellip;</span>`;
+                } else {
+                    html += `<button class="pag-btn ${item === paginaAttuale ? 'active' : ''}" onclick="cambiaPagina(${item})">${item}</button>`;
+                }
+            });
+
+            // Successivo
+            html += `<button class="pag-btn" onclick="cambiaPagina(${paginaAttuale + 1})" ${paginaAttuale === totalePagine ? 'disabled' : ''}>Succ &rsaquo;</button>`;
+
+            container.innerHTML = html;
+        }
+
+        function cambiaPagina(pagina) {
+            paginaCorrente = pagina;
+            const top = document.getElementById('veicoli-container').offsetTop - 80;
+            window.scrollTo({ top, behavior: 'smooth' });
+            caricaVeicoli(getFiltriAttuali(), paginaCorrente);
+        }
+
+        function getFiltriAttuali() {
+            const filtri = {
+                search: document.getElementById('search').value,
+                marca: document.getElementById('marca').value,
+                prezzoMin: document.getElementById('prezzoMin').value,
+                prezzoMax: document.getElementById('prezzoMax').value,
+                annoMin: document.getElementById('annoMin').value,
+                annoMax: document.getElementById('annoMax').value,
+                kmMin: document.getElementById('kmMin').value,
+                kmMax: document.getElementById('kmMax').value,
+                carburante: document.getElementById('carburante').value,
+                cambio: document.getElementById('cambio').value
+            };
+            const orderValue = document.getElementById('orderBy').value.split('-');
+            if (orderValue.length === 2) {
+                filtri.orderBy = orderValue[0];
+                filtri.orderDir = orderValue[1];
+            }
+            return filtri;
         }
 
         // Gestione confronto veicoli
@@ -948,26 +1022,8 @@
 
         // Gestione filtri
         function applicaFiltri() {
-            const filtri = {
-                search: document.getElementById('search').value,
-                marca: document.getElementById('marca').value,
-                prezzoMin: document.getElementById('prezzoMin').value,
-                prezzoMax: document.getElementById('prezzoMax').value,
-                annoMin: document.getElementById('annoMin').value,
-                annoMax: document.getElementById('annoMax').value,
-                kmMin: document.getElementById('kmMin').value,
-                kmMax: document.getElementById('kmMax').value,
-                carburante: document.getElementById('carburante').value,
-                cambio: document.getElementById('cambio').value
-            };
-            
-            const orderValue = document.getElementById('orderBy').value.split('-');
-            if (orderValue.length === 2) {
-                filtri.orderBy = orderValue[0];
-                filtri.orderDir = orderValue[1];
-            }
-            
-            caricaVeicoli(filtri);
+            paginaCorrente = 1;
+            caricaVeicoli(getFiltriAttuali(), 1);
         }
 
         function resetFiltri() {
@@ -982,8 +1038,8 @@
             document.getElementById('carburante').value = '';
             document.getElementById('cambio').value = '';
             document.getElementById('orderBy').value = 'id-DESC';
-            
-            caricaVeicoli();
+            paginaCorrente = 1;
+            caricaVeicoli({}, 1);
         }
 
         // Event listeners

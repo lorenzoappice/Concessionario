@@ -143,112 +143,109 @@ app.get('/api/verify', authenticateToken, (req, res) => {
 
 // ==================== VEICOLI ROUTES ====================
 
-// Route per ottenere tutti i veicoli con filtri e ricerca
+// Route per ottenere tutti i veicoli con filtri, ricerca e paginazione
 app.get('/api/veicoli', async (req, res) => {
   try {
-    const { 
-      search, 
-      marca, 
-      prezzoMin, 
-      prezzoMax, 
-      annoMin, 
-      annoMax,
-      kmMin,
-      kmMax,
-      carburante,
-      cambio,
-      orderBy = 'id',
-      orderDir = 'ASC'
+    const {
+      search, marca, prezzoMin, prezzoMax, annoMin, annoMax,
+      kmMin, kmMax, carburante, cambio,
+      orderBy = 'id', orderDir = 'ASC',
+      page = '1', limit = '9'
     } = req.query;
-    
-    let queryText = `
-      SELECT v.*, 
-             (SELECT array_agg(vi.image_path ORDER BY vi.image_order) FROM vehicle_images vi WHERE vi.vehicle_id = v.id) as immagini,
-             (SELECT array_agg(DISTINCT vo.optional_name) FROM vehicle_optionals vo WHERE vo.vehicle_id = v.id) as optional
-      FROM vehicles v
-      WHERE 1=1
-    `;
-    
+
+    // Costruisce la WHERE clause (riutilizzata per COUNT e per i dati)
+    let whereText = 'WHERE 1=1';
     const params = [];
     let paramCount = 1;
-    
-    // Filtro ricerca testuale
+
     if (search) {
-      queryText += ` AND (LOWER(v.marca) LIKE LOWER($${paramCount}) OR LOWER(v.modello) LIKE LOWER($${paramCount}))`;
+      whereText += ` AND (LOWER(v.marca) LIKE LOWER($${paramCount}) OR LOWER(v.modello) LIKE LOWER($${paramCount}))`;
       params.push(`%${search}%`);
       paramCount++;
     }
-    
-    // Filtro marca
     if (marca) {
-      queryText += ` AND LOWER(v.marca) = LOWER($${paramCount})`;
+      whereText += ` AND LOWER(v.marca) = LOWER($${paramCount})`;
       params.push(marca);
       paramCount++;
     }
-    
-    // Filtro prezzo
     if (prezzoMin) {
-      queryText += ` AND v.prezzo >= $${paramCount}`;
+      whereText += ` AND v.prezzo >= $${paramCount}`;
       params.push(prezzoMin);
       paramCount++;
     }
     if (prezzoMax) {
-      queryText += ` AND v.prezzo <= $${paramCount}`;
+      whereText += ` AND v.prezzo <= $${paramCount}`;
       params.push(prezzoMax);
       paramCount++;
     }
-    
-    // Filtro anno
     if (annoMin) {
-      queryText += ` AND v.anno >= $${paramCount}`;
+      whereText += ` AND v.anno >= $${paramCount}`;
       params.push(annoMin);
       paramCount++;
     }
     if (annoMax) {
-      queryText += ` AND v.anno <= $${paramCount}`;
+      whereText += ` AND v.anno <= $${paramCount}`;
       params.push(annoMax);
       paramCount++;
     }
-    
-    // Filtro chilometri
     if (kmMin) {
-      queryText += ` AND v.chilometri >= $${paramCount}`;
+      whereText += ` AND v.chilometri >= $${paramCount}`;
       params.push(kmMin);
       paramCount++;
     }
     if (kmMax) {
-      queryText += ` AND v.chilometri <= $${paramCount}`;
+      whereText += ` AND v.chilometri <= $${paramCount}`;
       params.push(kmMax);
       paramCount++;
     }
-    
-    // Filtro carburante
     if (carburante) {
-      queryText += ` AND LOWER(v.carburante) = LOWER($${paramCount})`;
+      whereText += ` AND LOWER(v.carburante) = LOWER($${paramCount})`;
       params.push(carburante);
       paramCount++;
     }
-    
-    // Filtro cambio
     if (cambio) {
-      queryText += ` AND LOWER(v.cambio) = LOWER($${paramCount})`;
+      whereText += ` AND LOWER(v.cambio) = LOWER($${paramCount})`;
       params.push(cambio);
       paramCount++;
     }
-    
-    /* no GROUP BY needed with subqueries */
-    
-    // Ordinamento
+
+    // Conta il totale dei risultati (per la paginazione)
+    const countResult = await query(`SELECT COUNT(*) as total FROM vehicles v ${whereText}`, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Ordinamento (whitelist anti-injection)
     const allowedOrderBy = ['id', 'prezzo', 'anno', 'chilometri', 'marca'];
     const allowedOrderDir = ['ASC', 'DESC'];
-    
-    if (allowedOrderBy.includes(orderBy) && allowedOrderDir.includes(orderDir.toUpperCase())) {
-      queryText += ` ORDER BY v.${orderBy} ${orderDir}`;
-    }
-    
-    const result = await query(queryText, params);
-    
-    res.json(result.rows);
+    const safeOrderBy = allowedOrderBy.includes(orderBy) ? orderBy : 'id';
+    const safeOrderDir = allowedOrderDir.includes(orderDir.toUpperCase()) ? orderDir.toUpperCase() : 'DESC';
+
+    // Paginazione
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit) || 9));
+    const offset = (pageNum - 1) * limitNum;
+    const totalPages = Math.ceil(total / limitNum) || 1;
+
+    // Query principale con LIMIT e OFFSET
+    const dataParams = [...params, limitNum, offset];
+    const queryText = `
+      SELECT v.*,
+             (SELECT array_agg(vi.image_path ORDER BY vi.image_order) FROM vehicle_images vi WHERE vi.vehicle_id = v.id) as immagini,
+             (SELECT array_agg(DISTINCT vo.optional_name) FROM vehicle_optionals vo WHERE vo.vehicle_id = v.id) as optional
+      FROM vehicles v
+      ${whereText}
+      ORDER BY v.${safeOrderBy} ${safeOrderDir}
+      LIMIT $${paramCount} OFFSET $${paramCount + 1}
+    `;
+
+    const result = await query(queryText, dataParams);
+
+    res.json({
+      veicoli: result.rows,
+      total,
+      page: pageNum,
+      totalPages,
+      limit: limitNum
+    });
   } catch (error) {
     console.error('Errore recupero veicoli:', error);
     res.status(500).json({ error: 'Errore nel recupero dei veicoli', detail: error.message });
