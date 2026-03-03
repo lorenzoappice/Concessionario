@@ -60,6 +60,51 @@ header h1::before {
     margin-right: 0.5rem;
 }
 
+/* Logo come link */
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.logo-link:hover h1 {
+    opacity: 0.85;
+}
+
+/* Hamburger button - nascosto su desktop */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 200;
+}
+
+.hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--text-light);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+.hamburger.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
 nav {
     display: flex;
     gap: 2rem;
@@ -714,21 +759,6 @@ main {
     min-height: 420px;
 }
 
-@media (max-width: 768px) {
-    .contatti-grid {
-        grid-template-columns: 1fr;
-        min-height: unset;
-    }
-
-    .contatti-mappa {
-        min-height: 300px;
-    }
-
-    .contatti-mappa iframe {
-        min-height: 300px;
-    }
-}
-
 footer {
     background: var(--primary-dark);
     padding: 2rem 0;
@@ -745,26 +775,139 @@ footer p {
 
 /* Responsive */
 @media (max-width: 768px) {
-    header .container {
-        flex-direction: column;
-        gap: 1rem;
+    /* Container */
+    .container {
+        padding: 0 16px;
     }
-    
+
+    /* Header */
+    header {
+        padding: 1rem 0;
+    }
+
+    header .container {
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    .logo-link {
+        flex: 1;
+    }
+
+    header h1 {
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    /* Hamburger visibile su mobile */
+    .hamburger {
+        display: flex;
+    }
+
+    /* Nav - menu a tendina su mobile */
+    nav#main-nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: var(--secondary-dark);
+        border-top: 1px solid var(--accent-gold);
+        gap: 0;
+        padding: 0.5rem 0;
+    }
+
+    nav#main-nav.open {
+        display: flex;
+    }
+
+    nav#main-nav a {
+        padding: 0.8rem 1.2rem;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    nav#main-nav a:last-child {
+        border-bottom: none;
+    }
+
+    nav#main-nav a:hover,
+    nav#main-nav a.active {
+        background: rgba(201, 169, 97, 0.1);
+        color: var(--accent-gold);
+        border-bottom-color: rgba(255,255,255,0.06);
+    }
+
+    /* Hero */
+    .hero {
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .hero h2 {
+        font-size: 1.6rem;
+        letter-spacing: 1px;
+    }
+
+    .hero p {
+        font-size: 0.9rem;
+    }
+
+    /* Grid veicoli */
     .veicoli-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0;
     }
-    
+
+    /* Cards */
+    .veicolo-info {
+        padding: 1.2rem;
+    }
+
+    .veicolo-info h3 {
+        font-size: 1.2rem;
+    }
+
+    /* Filtri */
+    .filtri-container {
+        grid-template-columns: 1fr !important;
+    }
+
+    .filtri-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Form */
     .form-row {
         grid-template-columns: 1fr;
     }
-    
+
+    /* Main padding */
+    main {
+        padding: 1.5rem 0;
+    }
+
+    /* Admin item */
     .veicolo-admin-item {
         flex-direction: column;
         text-align: center;
+        gap: 0.8rem;
     }
-    
-    .hero h2 {
-        font-size: 2rem;
+
+    /* Contatti */
+    .contatti-grid {
+        grid-template-columns: 1fr;
+        min-height: unset;
+    }
+
+    .contatti-mappa {
+        min-height: 260px;
+    }
+
+    .contatti-mappa iframe {
+        min-height: 260px;
     }
 }
 
@@ -977,6 +1120,11 @@ footer p {
 
 /* Responsive per dettaglio */
 @media (max-width: 768px) {
+    .dettaglio-wrapper {
+        padding: 1.2rem;
+        margin: 1rem 0;
+    }
+
     .dettaglio-grid {
         grid-template-columns: 1fr;
     }
@@ -994,7 +1142,11 @@ footer p {
     }
     
     .dettaglio-header h2 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
+    }
+
+    .prezzo-principale {
+        font-size: 1.6rem;
     }
 }
 

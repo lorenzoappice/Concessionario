@@ -9,8 +9,11 @@
 <body>
     <header>
         <div class="container">
-            <h1>🏎️ Pannello Amministratore</h1>
-            <nav>
+            <a href="/" class="logo-link"><h1>Pasquale Grandolfo Concessionario</h1></a>
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav">
                 <a href="/">Home</a>
                 <a href="#" id="logout-btn" class="btn-admin">Logout</a>
             </nav>
@@ -396,6 +399,19 @@
 
         // Carica i veicoli all'avvio
         caricaVeicoliAdmin();
+    </script>
+
+    <script>
+        document.getElementById('hamburger').addEventListener('click', function() {
+            document.getElementById('main-nav').classList.toggle('open');
+            this.classList.toggle('active');
+        });
+        document.querySelectorAll('#main-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('main-nav').classList.remove('open');
+                document.getElementById('hamburger').classList.remove('active');
+            });
+        });
     </script>
 </body>
 </html>
