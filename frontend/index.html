@@ -549,7 +549,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/veicoli', {
+                const response = await fetch('/api/veicoli', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -575,7 +575,7 @@
         // ===== MODIFICA VEICOLO =====
         async function apriModalModifica(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/veicoli/${id}`);
+                const response = await fetch(`/api/veicoli/${id}`);
                 const veicolo = await response.json();
 
                 // Popola form
@@ -668,7 +668,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/veicoli/${id}`, {
+                const response = await fetch(`/api/veicoli/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -704,7 +704,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/veicoli/${id}`, {
+                const response = await fetch(`/api/veicoli/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -747,7 +747,7 @@
                 if (filtri.orderBy) queryParams.append('orderBy', filtri.orderBy);
                 if (filtri.orderDir) queryParams.append('orderDir', filtri.orderDir);
                 
-                const url = `http://localhost:3000/api/veicoli?${queryParams.toString()}`;
+                const url = `/api/veicoli?${queryParams.toString()}`;
                 const response = await fetch(url);
                 
                 if (!response.ok) {
@@ -928,7 +928,7 @@
         // Carica marche disponibili
         async function caricaMarche() {
             try {
-                const response = await fetch('http://localhost:3000/api/veicoli/filtri/marche');
+                const response = await fetch('/api/veicoli/filtri/marche');
                 const marche = await response.json();
                 
                 const select = document.getElementById('marca');

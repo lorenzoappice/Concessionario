@@ -177,7 +177,7 @@
             }
             
             try {
-                const response = await fetch('http://localhost:3000/api/verify', {
+                const response = await fetch('/api/verify', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -240,7 +240,7 @@
         // Carica veicoli esistenti
         async function caricaVeicoliAdmin() {
             try {
-                const response = await fetch('http://localhost:3000/api/veicoli');
+                const response = await fetch('/api/veicoli');
                 const veicoli = await response.json();
                 
                 const container = document.getElementById('veicoli-admin-list');
@@ -319,7 +319,7 @@
             
             try {
                 const token = getAuthToken();
-                const response = await fetch('http://localhost:3000/api/veicoli', {
+                const response = await fetch('/api/veicoli', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -374,7 +374,7 @@
             
             try {
                 const token = getAuthToken();
-                const response = await fetch(`http://localhost:3000/api/veicoli/${id}`, {
+                const response = await fetch(`/api/veicoli/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`

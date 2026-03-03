@@ -44,7 +44,7 @@
             }
             
             try {
-                const response = await fetch(`http://localhost:3000/api/veicoli/${idVeicolo}`);
+                const response = await fetch(`/api/veicoli/${idVeicolo}`);
                 
                 if (!response.ok) {
                     throw new Error('Veicolo non trovato');
