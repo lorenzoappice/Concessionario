@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Page Loader -->
+<div id="page-loader">
+    <div class="loader-logo">Demo <span>Concessionaria</span></div>
+    <div class="loader-bar"></div>
+</div>
+<script>
+(function(){
+    var loader = document.getElementById('page-loader');
+    if(!loader) return;
+    function hide(){
+        loader.style.opacity='0';
+        loader.style.pointerEvents='none';
+        loader.style.transition='opacity 0.5s ease';
+        setTimeout(function(){ loader.remove(); }, 600);
+    }
+    setTimeout(hide, 1400);
+})();
+</script>
+
     <header>
         <div class="container">
             <a href="/" class="logo-link"><h1>Demo Concessionaria</h1></a>
@@ -15,25 +35,36 @@
             </button>
             <nav id="main-nav">
                 <a href="/">Home</a>
-                <a href="/login" class="btn-admin">Accesso Admin</a>
+                <a href="/contatti">Contattaci</a>
+                <a href="/login" class="btn-admin" id="auth-btn">Accesso Admin</a>
             </nav>
         </div>
     </header>
 
-    <main class="container">
-        <div class="confronto-wrapper">
-            <div class="confronto-header">
-                <button onclick="window.history.back()" class="btn-back">← Torna Indietro</button>
-                <h2>Confronto Veicoli</h2>
-            </div>
+    <!-- Hero Confronto -->
+    <section class="cmp-hero">
+        <canvas id="cmp-hero-canvas"></canvas>
+        <div class="cmp-hero-gradient"></div>
+        <a href="/" class="cmp-back-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Torna ai veicoli
+        </a>
+        <span class="cmp-hero-eyebrow">Analisi Comparativa</span>
+        <h2>Confronto Veicoli</h2>
+        <p class="cmp-hero-sub">Confronta le specifiche fianco a fianco per scegliere il veicolo perfetto</p>
+    </section>
 
-            <div id="confronto-container">
-                <div class="loading">Caricamento confronto...</div>
-            </div>
+    <!-- Main content -->
+    <main class="container cmp-main">
+        <div id="confronto-container" class="cmp-wrapper">
+            <div class="loading">Caricamento confronto...</div>
+        </div>
 
-            <div class="confronto-azioni">
-                <button onclick="window.location.href='/'" class="btn-primary">Torna alla Home</button>
-            </div>
+        <div class="cmp-bottom-actions">
+            <a href="/" class="cmp-btn-home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Torna alla Home
+            </a>
         </div>
     </main>
 
@@ -44,152 +75,196 @@
     </footer>
 
     <script>
+        // ===== Canvas particles =====
+        (function(){
+            var canvas = document.getElementById('cmp-hero-canvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var w, h, particles = [];
+            function resize(){ w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
+            window.addEventListener('resize', resize); resize();
+            for(var i = 0; i < 30; i++){
+                particles.push({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.5, dx: (Math.random()-0.5)*0.35, dy: (Math.random()-0.5)*0.35 });
+            }
+            function draw(){
+                ctx.clearRect(0,0,w,h);
+                particles.forEach(function(p){
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(201,169,97,0.25)'; ctx.fill();
+                    p.x += p.dx; p.y += p.dy;
+                    if(p.x < 0 || p.x > w) p.dx *= -1;
+                    if(p.y < 0 || p.y > h) p.dy *= -1;
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ===== Scroll reveal =====
+        var revealObs = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
+        }, { threshold: 0.08 });
+        function observeReveals(){ document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){ revealObs.observe(el); }); }
+
+        // ===== Load comparison =====
         async function caricaConfronto() {
             try {
-                // Ottieni gli ID dalla query string
-                const urlParams = new URLSearchParams(window.location.search);
-                const idsString = urlParams.get('ids');
-                
-                if (!idsString) {
-                    throw new Error('Nessun veicolo selezionato per il confronto');
-                }
-                
-                const ids = idsString.split(',').map(id => parseInt(id));
-                
-                if (ids.length < 2) {
-                    throw new Error('Seleziona almeno 2 veicoli per il confronto');
-                }
-                
-                if (ids.length > 3) {
-                    throw new Error('Puoi confrontare massimo 3 veicoli');
-                }
-                
-                // Richiesta al backend
-                const response = await fetch('/api/veicoli/confronta', {
+                var urlParams = new URLSearchParams(window.location.search);
+                var idsString = urlParams.get('ids');
+                if (!idsString) throw new Error('Nessun veicolo selezionato per il confronto');
+                var ids = idsString.split(',').map(function(id){ return parseInt(id); });
+                if (ids.length < 2) throw new Error('Seleziona almeno 2 veicoli per il confronto');
+                if (ids.length > 3) throw new Error('Puoi confrontare massimo 3 veicoli');
+
+                var response = await fetch('/api/veicoli/confronta', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ids })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: ids })
                 });
-                
-                if (!response.ok) {
-                    throw new Error('Errore nel recupero dei veicoli');
-                }
-                
-                const veicoli = await response.json();
-                
-                if (veicoli.length === 0) {
-                    throw new Error('Nessun veicolo trovato');
-                }
-                
+                if (!response.ok) throw new Error('Errore nel recupero dei veicoli');
+                var veicoli = await response.json();
+                if (veicoli.length === 0) throw new Error('Nessun veicolo trovato');
                 renderConfronto(veicoli);
             } catch (error) {
                 console.error('Errore confronto:', error);
-                document.getElementById('confronto-container').innerHTML = `
-                    <div class="error-container">
-                        <p class="error">⚠️ ${error.message}</p>
-                        <button onclick="window.history.back()" class="btn-retry">Torna Indietro</button>
-                    </div>
-                `;
+                document.getElementById('confronto-container').innerHTML =
+                    '<div class="error-container"><p class="error">\u26A0\uFE0F ' + error.message + '</p>' +
+                    '<button onclick="window.history.back()" class="btn-back" style="margin-top:1rem">\u2190 Torna Indietro</button></div>';
             }
         }
 
         function renderConfronto(veicoli) {
-            const container = document.getElementById('confronto-container');
-            
-            const campi = [
-                { label: 'Immagine', key: 'immagini', render: v => `<img src="${v.immagini[0]}" alt="${v.marca} ${v.modello}">` },
-                { label: 'Marca', key: 'marca' },
-                { label: 'Modello', key: 'modello' },
-                { label: 'Prezzo', key: 'prezzo', render: v => `<span class="confronto-prezzo">€ ${v.prezzo.toLocaleString()}</span>` },
+            var container = document.getElementById('confronto-container');
+
+            // Vehicle cards header
+            var html = '<div class="cmp-vehicles-row reveal">';
+            veicoli.forEach(function(v, idx){
+                var img = (v.immagini && v.immagini[0]) ? v.immagini[0] : '/uploads/placeholder.jpg';
+                html += '<div class="cmp-vehicle-card reveal-delay-' + (idx + 1) + '">' +
+                    '<div class="cmp-vehicle-img"><img src="' + img + '" alt="' + v.marca + ' ' + v.modello + '"></div>' +
+                    '<div class="cmp-vehicle-head">' +
+                        '<h3>' + v.marca + ' ' + v.modello + '</h3>' +
+                        '<span class="cmp-vehicle-price">\u20AC ' + Number(v.prezzo).toLocaleString() + '</span>' +
+                    '</div>' +
+                    '<a href="/dettaglio.html?id=' + v.id + '" class="cmp-vehicle-link">Vedi Dettagli \u2192</a>' +
+                '</div>';
+            });
+            html += '</div>';
+
+            // Comparison rows
+            var campi = [
                 { label: 'Anno', key: 'anno' },
-                { label: 'Chilometri', key: 'chilometri', render: v => `${v.chilometri.toLocaleString()} km` },
-                { label: 'Potenza', key: 'potenza', render: v => `${v.potenza} CV` },
-                { label: 'Cilindrata', key: 'cilindrata', render: v => `${v.cilindrata} cc` },
+                { label: 'Chilometri', key: 'chilometri', fmt: function(v){ return Number(v.chilometri).toLocaleString() + ' km'; } },
+                { label: 'Potenza', key: 'potenza', fmt: function(v){ return v.potenza + ' CV'; } },
+                { label: 'Cilindrata', key: 'cilindrata', fmt: function(v){ return v.cilindrata + ' cc'; } },
                 { label: 'Carburante', key: 'carburante' },
                 { label: 'Cambio', key: 'cambio' },
                 { label: 'Colore', key: 'colore' },
                 { label: 'Porte', key: 'porte' },
                 { label: 'Posti', key: 'posti' },
                 { label: 'Carrozzeria', key: 'carrozzeria' },
-                { label: 'Trazione', key: 'trazione' }
+                { label: 'Trazione', key: 'trazione' },
+                { label: 'Condizione', key: 'condizione', fmt: function(v){ return v.condizione || 'Usato'; } },
+                { label: 'Garanzia', key: 'garanzia', fmt: function(v){ return v.garanzia || '-'; } },
+                { label: 'Neopatentati', key: 'neopatentati', fmt: function(v){ return v.neopatentati || 'No'; } },
+                { label: 'Marce', key: 'marce', fmt: function(v){ return v.marce || '-'; } },
+                { label: 'Cilindri', key: 'cilindri', fmt: function(v){ return v.cilindri || '-'; } },
+                { label: 'Peso a Vuoto', key: 'peso_vuoto', fmt: function(v){ return v.peso_vuoto ? v.peso_vuoto + ' kg' : '-'; } },
+                { label: 'Classe Emissioni', key: 'classe_emissioni', fmt: function(v){ return v.classe_emissioni || '-'; } },
+                { label: 'Consumi', key: 'consumi', fmt: function(v){ return v.consumi || '-'; } }
             ];
-            
-            let tableHTML = `
-                <div class="confronto-table-wrapper">
-                    <table class="confronto-table">
-                        <thead>
-                            <tr>
-                                <th>Caratteristica</th>
-                                ${veicoli.map(v => `<th>${v.marca} ${v.modello}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            campi.forEach(campo => {
-                tableHTML += `
-                    <tr>
-                        <td class="label-cell">${campo.label}</td>
-                        ${veicoli.map(v => {
-                            const value = campo.render ? campo.render(v) : v[campo.key];
-                            return `<td>${value !== null && value !== undefined ? value : '-'}</td>`;
-                        }).join('')}
-                    </tr>
-                `;
+
+            html += '<div class="cmp-specs-section reveal reveal-delay-2">';
+            html += '<div class="cmp-section-head"><span class="cmp-section-eyebrow">Specifiche a Confronto</span><h3>Tabella Comparativa</h3></div>';
+            html += '<div class="cmp-table-wrap"><table class="cmp-table">';
+
+            // Header
+            html += '<thead><tr><th class="cmp-label-th">Caratteristica</th>';
+            veicoli.forEach(function(v){ html += '<th>' + v.marca + ' ' + v.modello + '</th>'; });
+            html += '</tr></thead><tbody>';
+
+            // Data rows
+            campi.forEach(function(campo, ri){
+                var best = findBest(campo, veicoli);
+                html += '<tr class="cmp-row">';
+                html += '<td class="cmp-label-cell">' + campo.label + '</td>';
+                veicoli.forEach(function(v, ci){
+                    var val = campo.fmt ? campo.fmt(v) : (v[campo.key] !== null && v[campo.key] !== undefined ? v[campo.key] : '-');
+                    var isBest = (best !== null && best === ci);
+                    html += '<td class="' + (isBest ? 'cmp-best' : '') + '">' + val + '</td>';
+                });
+                html += '</tr>';
             });
-            
-            // Descrizione
-            tableHTML += `
-                <tr>
-                    <td class="label-cell">Descrizione</td>
-                    ${veicoli.map(v => `<td style="text-align: left; max-width: 300px;">${v.descrizione || '-'}</td>`).join('')}
-                </tr>
-            `;
-            
-            // Optional
-            tableHTML += `
-                <tr>
-                    <td class="label-cell">Optional</td>
-                    ${veicoli.map(v => {
-                        if (v.optional && v.optional.length > 0) {
-                            return `<td style="text-align: left;">
-                                <ul style="list-style: none; padding: 0;">
-                                    ${v.optional.map(opt => `<li style="padding: 0.3rem 0;">✓ ${opt}</li>`).join('')}
-                                </ul>
-                            </td>`;
-                        }
-                        return `<td>-</td>`;
-                    }).join('')}
-                </tr>
-            `;
-            
-            // Azioni
-            tableHTML += `
-                <tr>
-                    <td class="label-cell">Azioni</td>
-                    ${veicoli.map(v => `
-                        <td>
-                            <button onclick="window.location.href='/dettaglio.html?id=${v.id}'" class="btn-view">
-                                Vedi Dettagli
-                            </button>
-                        </td>
-                    `).join('')}
-                </tr>
-            `;
-            
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            container.innerHTML = tableHTML;
+
+            // Description row
+            html += '<tr class="cmp-row"><td class="cmp-label-cell">Descrizione</td>';
+            veicoli.forEach(function(v){
+                html += '<td class="cmp-desc-cell">' + (v.descrizione || '-') + '</td>';
+            });
+            html += '</tr>';
+
+            // Optional row
+            html += '<tr class="cmp-row"><td class="cmp-label-cell">Optional</td>';
+            veicoli.forEach(function(v){
+                if (v.optional && v.optional.length > 0) {
+                    html += '<td class="cmp-opt-cell"><ul>';
+                    v.optional.forEach(function(opt){ html += '<li>' + opt + '</li>'; });
+                    html += '</ul></td>';
+                } else {
+                    html += '<td>-</td>';
+                }
+            });
+            html += '</tr>';
+
+            html += '</tbody></table></div></div>';
+
+            container.innerHTML = html;
+            observeReveals();
         }
 
-        // Carica confronto all'avvio
+        // Highlight best value for numeric fields
+        function findBest(campo, veicoli) {
+            if (!['anno', 'potenza', 'cilindrata', 'posti', 'porte'].includes(campo.key)) return null;
+            // Lower-is-better: chilometri. Higher-is-better: everything else
+            var lowerBetter = (campo.key === 'chilometri');
+            var bestIdx = null, bestVal = null;
+            veicoli.forEach(function(v, i){
+                var raw = parseInt(v[campo.key]);
+                if (isNaN(raw)) return;
+                if (bestVal === null || (lowerBetter ? raw < bestVal : raw > bestVal)) { bestVal = raw; bestIdx = i; }
+            });
+            // Only highlight if there's an actual difference
+            var allSame = veicoli.every(function(v){ return parseInt(v[campo.key]) === bestVal; });
+            return allSame ? null : bestIdx;
+        }
+
+        // ===== Header scroll =====
+        (function(){
+            var header = document.querySelector('header');
+            window.addEventListener('scroll', function(){
+                header.classList.toggle('scrolled', window.scrollY > 40);
+            });
+        })();
+
         caricaConfronto();
+
+        // Auth
+        (function(){
+            var token = localStorage.getItem('authToken');
+            var userInfo = localStorage.getItem('userInfo');
+            var info = userInfo ? JSON.parse(userInfo) : null;
+            var authBtn = document.getElementById('auth-btn');
+            if (token && info && info.role === 'admin') {
+                authBtn.textContent = 'Logout';
+                authBtn.href = '#';
+                authBtn.onclick = function(e){
+                    e.preventDefault();
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userInfo');
+                    window.location.reload();
+                };
+            }
+        })();
     </script>
 
     <script>
@@ -197,14 +272,12 @@
             document.getElementById('main-nav').classList.toggle('open');
             this.classList.toggle('active');
         });
-        document.querySelectorAll('#main-nav a').forEach(link => {
-            link.addEventListener('click', () => {
+        document.querySelectorAll('#main-nav a').forEach(function(link) {
+            link.addEventListener('click', function() {
                 document.getElementById('main-nav').classList.remove('open');
                 document.getElementById('hamburger').classList.remove('active');
             });
         });
     </script>
-</body>
-</html>
 </body>
 </html>

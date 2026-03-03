@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Page Loader -->
+<div id="page-loader">
+    <div class="loader-logo">Demo <span>Concessionaria</span></div>
+    <div class="loader-bar"></div>
+</div>
+<script>
+(function(){
+    var loader = document.getElementById('page-loader');
+    if(!loader) return;
+    function hide(){
+        loader.style.opacity='0';
+        loader.style.pointerEvents='none';
+        loader.style.transition='opacity 0.5s ease';
+        setTimeout(function(){ loader.remove(); }, 600);
+    }
+    setTimeout(hide, 1400);
+})();
+</script>
+
     <header>
         <div class="container">
             <a href="/" class="logo-link"><h1>Demo Concessionaria</h1></a>
@@ -21,8 +41,23 @@
         </div>
     </header>
 
-    <main class="container">
-        <div id="dettaglio-container" class="dettaglio-wrapper">
+    <!-- Hero Dettaglio -->
+    <section class="det-hero" id="det-hero">
+        <canvas id="det-hero-canvas"></canvas>
+        <div class="det-hero-gradient"></div>
+        <a href="/" class="det-back-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Torna ai veicoli
+        </a>
+        <span class="det-hero-eyebrow" id="det-eyebrow">Dettaglio Veicolo</span>
+        <h2 id="det-hero-title">Caricamento...</h2>
+        <p class="det-hero-price" id="det-hero-price"></p>
+        <div class="det-hero-badges" id="det-hero-badges"></div>
+    </section>
+
+    <!-- Main content -->
+    <main class="container det-main">
+        <div id="dettaglio-container" class="det-wrapper">
             <div class="loading">Caricamento dettagli...</div>
         </div>
     </main>
@@ -36,325 +71,275 @@
     <script>
         let currentImageIndex = 0;
         let allImages = [];
-        
+
+        // ===== Canvas particles =====
+        (function(){
+            const canvas = document.getElementById('det-hero-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h, particles = [];
+            function resize(){ w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight; }
+            window.addEventListener('resize', resize); resize();
+            for(let i = 0; i < 35; i++){
+                particles.push({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.5, dx: (Math.random()-0.5)*0.4, dy: (Math.random()-0.5)*0.4 });
+            }
+            function draw(){
+                ctx.clearRect(0,0,w,h);
+                particles.forEach(p => {
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(201,169,97,0.25)'; ctx.fill();
+                    p.x += p.dx; p.y += p.dy;
+                    if(p.x < 0 || p.x > w) p.dx *= -1;
+                    if(p.y < 0 || p.y > h) p.dy *= -1;
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ===== Scroll reveal =====
+        const revealObs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
+        }, { threshold: 0.1 });
+        function observeReveals(){ document.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObs.observe(el)); }
+
+        // ===== Load vehicle detail =====
         async function caricaDettaglioVeicolo() {
             const urlParams = new URLSearchParams(window.location.search);
             const idVeicolo = urlParams.get('id');
-            
-            if (!idVeicolo) {
-                window.location.href = '/';
-                return;
-            }
-            
+            if (!idVeicolo) { window.location.href = '/'; return; }
+
             try {
-                const response = await fetch(`/api/veicoli/${idVeicolo}`);
-                
-                if (!response.ok) {
-                    throw new Error('Veicolo non trovato');
-                }
-                
-                const veicolo = await response.json();
+                const response = await fetch('/api/veicoli/' + idVeicolo);
+                if (!response.ok) throw new Error('Veicolo non trovato');
+                const v = await response.json();
+                const immagini = v.immagini || [v.immagine];
+                allImages = immagini;
+
+                // Populate hero
+                document.getElementById('det-eyebrow').textContent = (v.condizione || 'Usato') + ' \u2022 ' + (v.tipo_veicolo || 'Auto');
+                document.getElementById('det-hero-title').textContent = v.marca + ' ' + v.modello;
+                document.getElementById('det-hero-price').textContent = '\u20AC ' + Number(v.prezzo).toLocaleString();
+                document.getElementById('det-hero-badges').innerHTML =
+                    '<span>' + v.anno + '</span>' +
+                    '<span>' + Number(v.chilometri).toLocaleString() + ' km</span>' +
+                    '<span>' + v.potenza + ' CV</span>' +
+                    '<span>' + v.carburante + '</span>' +
+                    '<span>' + v.cambio + '</span>';
+                document.title = v.marca + ' ' + v.modello + ' - Demo Concessionario';
+
+                // Build main content
                 const container = document.getElementById('dettaglio-container');
-                
-                const immagini = veicolo.immagini || [veicolo.immagine];
-                allImages = immagini; // Salva per il carousel
-                
-                container.innerHTML = `
-                    <div class="dettaglio-content">
-                        <div class="dettaglio-header">
-                            <button onclick="window.location.href='/'" class="btn-back">← Torna alla lista</button>
-                            <h2>${veicolo.marca} ${veicolo.modello}</h2>
-                            <p class="prezzo-principale">€ ${veicolo.prezzo.toLocaleString()}</p>
-                        </div>
-                        
-                        <div class="dettaglio-grid">
-                            <div class="dettaglio-immagine">
-                                <div class="dettaglio-carousel">
-                                    <div class="dettaglio-carousel-main" style="position:relative;">
-                                        <img id="main-image" src="${immagini[0]}" alt="${veicolo.marca} ${veicolo.modello}">
-                                        ${immagini.length > 1 ? `
-                                            <button class="carousel-btn prev" onclick="changeImage(-1)">&#8249;</button>
-                                            <button class="carousel-btn next" onclick="changeImage(1)">&#8250;</button>
-                                        ` : ''}
-                                        <button class="gallery-fullscreen-btn" onclick="openFullscreen(currentImageIndex)" title="Schermo intero" aria-label="Apri immagine a schermo intero">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="15 3 21 3 21 9"></polyline>
-                                                <polyline points="9 21 3 21 3 15"></polyline>
-                                                <line x1="21" y1="3" x2="14" y2="10"></line>
-                                                <line x1="3" y1="21" x2="10" y2="14"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    ${immagini.length > 1 ? `
-                                    <div class="dettaglio-thumbnails-wrapper" id="thumbs-wrapper">
-                                        <button class="thumb-arrow prev" onclick="scrollThumbs(-1)" id="thumb-prev">&#8249;</button>
-                                        <div class="dettaglio-thumbnails-viewport" id="thumbs-viewport">
-                                            <div class="dettaglio-thumbnails-track" id="thumbs-track">
-                                                ${immagini.map((img, i) => `
-                                                    <div class="thumbnail ${i === 0 ? 'active' : ''}" onclick="goToImage(${i})" data-idx="${i}">
-                                                        <img src="${img}" alt="Foto ${i+1}">
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                        <button class="thumb-arrow next" onclick="scrollThumbs(1)" id="thumb-next">&#8250;</button>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            
-                            <div class="dettaglio-info-principale">
-                                <div class="info-card">
-                                    <h3>Caratteristiche Principali</h3>
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <span class="info-label">Anno</span>
-                                            <span class="info-value">${veicolo.anno}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Chilometri</span>
-                                            <span class="info-value">${veicolo.chilometri.toLocaleString()} km</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Carburante</span>
-                                            <span class="info-value">${veicolo.carburante}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Cambio</span>
-                                            <span class="info-value">${veicolo.cambio}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Colore</span>
-                                            <span class="info-value">${veicolo.colore}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Porte</span>
-                                            <span class="info-value">${veicolo.porte}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Potenza</span>
-                                            <span class="info-value">${veicolo.potenza} CV</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Cilindrata</span>
-                                            <span class="info-value">${veicolo.cilindrata} cc</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Trazione</span>
-                                            <span class="info-value">${veicolo.trazione}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Posti</span>
-                                            <span class="info-value">${veicolo.posti}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Carrozzeria</span>
-                                            <span class="info-value">${veicolo.carrozzeria}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Condizione</span>
-                                            <span class="info-value">${veicolo.condizione || 'Usato'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Tipo Veicolo</span>
-                                            <span class="info-value">${veicolo.tipo_veicolo || 'Auto'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Garanzia</span>
-                                            <span class="info-value">${veicolo.garanzia || '-'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Neopatentati</span>
-                                            <span class="info-value">${veicolo.neopatentati || 'No'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Ultimo Tagliando</span>
-                                            <span class="info-value">${veicolo.ultimo_tagliando || '-'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Proprietari</span>
-                                            <span class="info-value">${veicolo.proprietari !== null && veicolo.proprietari !== undefined ? veicolo.proprietari : 0}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Marce</span>
-                                            <span class="info-value">${veicolo.marce || '-'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Cilindri</span>
-                                            <span class="info-value">${veicolo.cilindri || '-'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Peso a Vuoto</span>
-                                            <span class="info-value">${veicolo.peso_vuoto ? veicolo.peso_vuoto + ' kg' : '-'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Classe Emissioni</span>
-                                            <span class="info-value">${veicolo.classe_emissioni || '-'}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Consumi</span>
-                                            <span class="info-value">${veicolo.consumi || '-'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="dettaglio-descrizione">
-                            <div class="info-card">
-                                <h3>Descrizione</h3>
-                                <p>${veicolo.descrizione}</p>
-                            </div>
-                        </div>
-                        
-                        ${veicolo.optional && veicolo.optional.length > 0 ? `
-                        <div class="dettaglio-optional">
-                            <div class="info-card">
-                                <h3>Optional e Accessori</h3>
-                                <ul class="optional-list">
-                                    ${veicolo.optional.map(opt => `<li>✓ ${opt}</li>`).join('')}
-                                </ul>
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div class="dettaglio-azioni">
-                            <button class="btn-contatta">📞 Contattaci per info</button>
-                            <button class="btn-prenota">📅 Prenota test drive</button>
-                        </div>
-                    </div>
-                `;
-                
-                // Event listeners per i bottoni
-                document.querySelector('.btn-contatta').addEventListener('click', () => {
-                    alert('Per informazioni contattaci al: +39 02 1234567');
-                });
-                
-                document.querySelector('.btn-prenota').addEventListener('click', () => {
-                    alert('Per prenotare un test drive contattaci al: +39 02 1234567');
-                });
-                
+                container.innerHTML = buildGallery(v, immagini) + buildSpecs(v) + buildDescription(v) + buildOptionals(v) + buildActions(v);
+
+                observeReveals();
+
+                var btnC = document.querySelector('.det-cta-contact');
+                var btnT = document.querySelector('.det-cta-test');
+                if(btnC) btnC.addEventListener('click', function(){ window.location.href = '/contatti'; });
+                if(btnT) btnT.addEventListener('click', function(){ window.location.href = '/contatti'; });
             } catch (error) {
-                console.error('Errore nel caricamento del veicolo:', error);
-                document.getElementById('dettaglio-container').innerHTML = 
+                console.error('Errore:', error);
+                document.getElementById('dettaglio-container').innerHTML =
                     '<div class="error">Veicolo non trovato o errore nel caricamento.</div>' +
-                    '<button onclick="window.location.href=\'/\'" class="btn-back">← Torna alla lista</button>';
+                    '<a href="/" class="btn-back" style="margin-top:1rem;display:inline-block;">\u2190 Torna alla lista</a>';
             }
         }
 
-        // Gestione Carousel + Thumbnails + Lightbox
+        function buildGallery(v, immagini) {
+            return '<section class="det-gallery reveal">' +
+                '<div class="det-gallery-main" style="position:relative">' +
+                    '<img id="main-image" src="' + immagini[0] + '" alt="' + v.marca + ' ' + v.modello + '">' +
+                    (immagini.length > 1 ?
+                        '<button class="det-gal-nav prev" onclick="changeImage(-1)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg></button>' +
+                        '<button class="det-gal-nav next" onclick="changeImage(1)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg></button>'
+                    : '') +
+                    '<button class="det-gal-fullscreen" onclick="openFullscreen(currentImageIndex)" title="Schermo intero">' +
+                        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>' +
+                    '</button>' +
+                    '<span class="det-gal-counter" id="gal-counter">1 / ' + immagini.length + '</span>' +
+                '</div>' +
+                (immagini.length > 1 ?
+                    '<div class="det-thumbs-wrap" id="thumbs-wrapper">' +
+                        '<button class="det-thumb-arrow prev" onclick="scrollThumbs(-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>' +
+                        '<div class="det-thumbs-viewport" id="thumbs-viewport">' +
+                            '<div class="det-thumbs-track" id="thumbs-track">' +
+                                immagini.map(function(img, i){
+                                    return '<div class="det-thumb ' + (i === 0 ? 'active' : '') + '" onclick="goToImage(' + i + ')" data-idx="' + i + '"><img src="' + img + '" alt="Foto ' + (i+1) + '"></div>';
+                                }).join('') +
+                            '</div>' +
+                        '</div>' +
+                        '<button class="det-thumb-arrow next" onclick="scrollThumbs(1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>' +
+                    '</div>'
+                : '') +
+            '</section>';
+        }
+
+        function buildSpecs(v) {
+            var specs = [
+                { icon: '\uD83D\uDCC5', label: 'Anno', val: v.anno },
+                { icon: '\uD83D\uDEE3\uFE0F', label: 'Chilometri', val: Number(v.chilometri).toLocaleString() + ' km' },
+                { icon: '\u26FD', label: 'Carburante', val: v.carburante },
+                { icon: '\u2699\uFE0F', label: 'Cambio', val: v.cambio },
+                { icon: '\uD83C\uDFA8', label: 'Colore', val: v.colore },
+                { icon: '\uD83D\uDEAA', label: 'Porte', val: v.porte },
+                { icon: '\uD83D\uDC34', label: 'Potenza', val: v.potenza + ' CV' },
+                { icon: '\uD83D\uDD27', label: 'Cilindrata', val: v.cilindrata + ' cc' },
+                { icon: '\uD83C\uDFCE\uFE0F', label: 'Trazione', val: v.trazione },
+                { icon: '\uD83D\uDCBA', label: 'Posti', val: v.posti },
+                { icon: '\uD83D\uDE97', label: 'Carrozzeria', val: v.carrozzeria },
+                { icon: '\uD83D\uDCCB', label: 'Condizione', val: v.condizione || 'Usato' },
+                { icon: '\uD83C\uDFF7\uFE0F', label: 'Tipo Veicolo', val: v.tipo_veicolo || 'Auto' },
+                { icon: '\uD83D\uDEE1\uFE0F', label: 'Garanzia', val: v.garanzia || '-' },
+                { icon: '\uD83E\uDEAA', label: 'Neopatentati', val: v.neopatentati || 'No' },
+                { icon: '\uD83D\uDD29', label: 'Ultimo Tagliando', val: v.ultimo_tagliando || '-' },
+                { icon: '\uD83D\uDC64', label: 'Proprietari', val: v.proprietari !== null && v.proprietari !== undefined ? v.proprietari : 0 },
+                { icon: '\u26A1', label: 'Marce', val: v.marce || '-' },
+                { icon: '\uD83D\uDD36', label: 'Cilindri', val: v.cilindri || '-' },
+                { icon: '\u2696\uFE0F', label: 'Peso a Vuoto', val: v.peso_vuoto ? v.peso_vuoto + ' kg' : '-' },
+                { icon: '\uD83C\uDF3F', label: 'Classe Emissioni', val: v.classe_emissioni || '-' },
+                { icon: '\u26FD', label: 'Consumi', val: v.consumi || '-' }
+            ];
+            var html = '<section class="det-specs reveal reveal-delay-1"><div class="det-section-head"><span class="det-section-eyebrow">Specifiche Tecniche</span><h3>Caratteristiche</h3></div><div class="det-specs-grid">';
+            specs.forEach(function(s, i){
+                html += '<div class="det-spec-card" style="animation-delay:' + (i * 0.04) + 's"><span class="det-spec-icon">' + s.icon + '</span><span class="det-spec-label">' + s.label + '</span><span class="det-spec-val">' + (s.val !== null && s.val !== undefined ? s.val : '-') + '</span></div>';
+            });
+            html += '</div></section>';
+            return html;
+        }
+
+        function buildDescription(v) {
+            if (!v.descrizione) return '';
+            return '<section class="det-description reveal reveal-delay-2"><div class="det-section-head"><span class="det-section-eyebrow">Info</span><h3>Descrizione</h3></div><p>' + v.descrizione + '</p></section>';
+        }
+
+        function buildOptionals(v) {
+            if (!v.optional || v.optional.length === 0) return '';
+            var html = '<section class="det-optionals reveal reveal-delay-3"><div class="det-section-head"><span class="det-section-eyebrow">Equipaggiamento</span><h3>Optional &amp; Accessori</h3></div><ul class="det-opt-list">';
+            v.optional.forEach(function(opt){
+                html += '<li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' + opt + '</li>';
+            });
+            html += '</ul></section>';
+            return html;
+        }
+
+        function buildActions(v) {
+            return '<section class="det-actions reveal reveal-delay-4">' +
+                '<button class="det-cta-contact"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg> Contattaci</button>' +
+                '<button class="det-cta-test"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Prenota Test Drive</button>' +
+            '</section>';
+        }
+
+        // ===== Carousel + Thumbnails + Lightbox =====
         const THUMBS_VISIBLE = 5;
-        let thumbOffset = 0; // quante thumbnail sono scrollate a sinistra
+        let thumbOffset = 0;
 
         function changeImage(direction) {
             currentImageIndex = (currentImageIndex + direction + allImages.length) % allImages.length;
             updateImage();
         }
-
-        function goToImage(index) {
-            currentImageIndex = index;
-            updateImage();
-        }
+        function goToImage(index) { currentImageIndex = index; updateImage(); }
 
         function updateImage() {
-            const mainImg = document.getElementById('main-image');
+            var mainImg = document.getElementById('main-image');
             if (mainImg && allImages[currentImageIndex]) {
-                mainImg.src = allImages[currentImageIndex];
+                mainImg.style.opacity = '0';
+                setTimeout(function(){
+                    mainImg.src = allImages[currentImageIndex];
+                    mainImg.style.opacity = '1';
+                }, 180);
             }
-            // Aggiorna thumbnail attiva
-            document.querySelectorAll('.thumbnail').forEach((t, i) => {
-                t.classList.toggle('active', i === currentImageIndex);
-            });
+            document.querySelectorAll('.det-thumb').forEach(function(t, i){ t.classList.toggle('active', i === currentImageIndex); });
+            var counter = document.getElementById('gal-counter');
+            if (counter) counter.textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
             centreThumbOnCurrent();
-            // Aggiorna lightbox se aperto
-            const lbImg = document.querySelector('#lightbox-modal .lightbox-content img');
+            var lbImg = document.querySelector('#lightbox-modal .lightbox-content img');
             if (lbImg) {
                 lbImg.src = allImages[currentImageIndex];
-                const counter = document.querySelector('#lightbox-modal .lightbox-counter');
-                if (counter) counter.textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
+                var c = document.querySelector('#lightbox-modal .lightbox-counter');
+                if (c) c.textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
             }
         }
 
         function scrollThumbs(dir) {
-            const track = document.getElementById('thumbs-track');
+            var track = document.getElementById('thumbs-track');
             if (!track) return;
-            const total = allImages.length;
-            const maxOffset = Math.max(0, total - THUMBS_VISIBLE);
-            thumbOffset = Math.min(Math.max(thumbOffset + dir, 0), maxOffset);
-            const thumbWidth = track.querySelector('.thumbnail') ? track.querySelector('.thumbnail').offsetWidth + 8 : 100;
-            track.style.transform = 'translateX(-' + (thumbOffset * thumbWidth) + 'px)';
+            var maxOff = Math.max(0, allImages.length - THUMBS_VISIBLE);
+            thumbOffset = Math.min(Math.max(thumbOffset + dir, 0), maxOff);
+            var tw = track.querySelector('.det-thumb') ? track.querySelector('.det-thumb').offsetWidth + 8 : 78;
+            track.style.transform = 'translateX(-' + (thumbOffset * tw) + 'px)';
         }
 
         function centreThumbOnCurrent() {
-            const half = Math.floor(THUMBS_VISIBLE / 2);
-            const total = allImages.length;
-            const maxOffset = Math.max(0, total - THUMBS_VISIBLE);
-            thumbOffset = Math.min(Math.max(currentImageIndex - half, 0), maxOffset);
-            const track = document.getElementById('thumbs-track');
+            var half = Math.floor(THUMBS_VISIBLE / 2);
+            var maxOff = Math.max(0, allImages.length - THUMBS_VISIBLE);
+            thumbOffset = Math.min(Math.max(currentImageIndex - half, 0), maxOff);
+            var track = document.getElementById('thumbs-track');
             if (!track) return;
-            const thumbWidth = track.querySelector('.thumbnail') ? track.querySelector('.thumbnail').offsetWidth + 8 : 100;
-            track.style.transform = 'translateX(-' + (thumbOffset * thumbWidth) + 'px)';
+            var tw = track.querySelector('.det-thumb') ? track.querySelector('.det-thumb').offsetWidth + 8 : 78;
+            track.style.transform = 'translateX(-' + (thumbOffset * tw) + 'px)';
         }
 
         function openFullscreen(index) {
             currentImageIndex = index;
-            let modal = document.getElementById('lightbox-modal');
+            var modal = document.getElementById('lightbox-modal');
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = 'lightbox-modal';
                 modal.className = 'lightbox-overlay';
-                modal.innerHTML = `
-                    <button class="lightbox-close" onclick="closeFullscreen()" title="Chiudi">&#10005;</button>
-                    <button class="lightbox-nav prev" onclick="lightboxNav(-1)">&#8249;</button>
-                    <div class="lightbox-content"><img src="" alt=""></div>
-                    <button class="lightbox-nav next" onclick="lightboxNav(1)">&#8250;</button>
-                    <div class="lightbox-counter"></div>
-                `;
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) closeFullscreen();
-                });
+                modal.innerHTML =
+                    '<button class="lightbox-close" onclick="closeFullscreen()" title="Chiudi">&#10005;</button>' +
+                    '<button class="lightbox-nav prev" onclick="lightboxNav(-1)">&#8249;</button>' +
+                    '<div class="lightbox-content"><img src="" alt=""></div>' +
+                    '<button class="lightbox-nav next" onclick="lightboxNav(1)">&#8250;</button>' +
+                    '<div class="lightbox-counter"></div>';
+                modal.addEventListener('click', function(e) { if (e.target === modal) closeFullscreen(); });
                 document.body.appendChild(modal);
             }
-            const img = modal.querySelector('.lightbox-content img');
-            img.src = allImages[currentImageIndex];
+            modal.querySelector('.lightbox-content img').src = allImages[currentImageIndex];
             modal.querySelector('.lightbox-counter').textContent = (currentImageIndex + 1) + ' / ' + allImages.length;
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
-
         function closeFullscreen() {
-            const modal = document.getElementById('lightbox-modal');
+            var modal = document.getElementById('lightbox-modal');
             if (modal) modal.style.display = 'none';
             document.body.style.overflow = '';
         }
-
         function lightboxNav(dir) {
             currentImageIndex = (currentImageIndex + dir + allImages.length) % allImages.length;
             updateImage();
         }
 
-        // Navigazione tastiera
         document.addEventListener('keydown', function(e) {
-            const modal = document.getElementById('lightbox-modal');
-            const isOpen = modal && modal.style.display === 'flex';
+            var modal = document.getElementById('lightbox-modal');
+            var isOpen = modal && modal.style.display === 'flex';
             if (e.key === 'Escape' && isOpen) { closeFullscreen(); return; }
             if (e.key === 'ArrowLeft') { isOpen ? lightboxNav(-1) : changeImage(-1); }
             if (e.key === 'ArrowRight') { isOpen ? lightboxNav(1) : changeImage(1); }
         });
 
-        // Carica i dettagli all'avvio
+        // ===== Header scroll effect =====
+        (function(){
+            var header = document.querySelector('header');
+            window.addEventListener('scroll', function(){
+                header.classList.toggle('scrolled', window.scrollY > 40);
+            });
+        })();
+
+        // Boot
         caricaDettaglioVeicolo();
 
         // Auth navbar
         (function() {
-            const token = localStorage.getItem('authToken');
-            const userInfo = localStorage.getItem('userInfo');
-            const info = userInfo ? JSON.parse(userInfo) : null;
-            const authBtn = document.getElementById('auth-btn');
+            var token = localStorage.getItem('authToken');
+            var userInfo = localStorage.getItem('userInfo');
+            var info = userInfo ? JSON.parse(userInfo) : null;
+            var authBtn = document.getElementById('auth-btn');
             if (token && info && info.role === 'admin') {
                 authBtn.textContent = 'Logout';
                 authBtn.href = '#';
-                authBtn.onclick = (e) => {
+                authBtn.onclick = function(e) {
                     e.preventDefault();
                     localStorage.removeItem('authToken');
                     localStorage.removeItem('userInfo');
@@ -369,8 +354,8 @@
             document.getElementById('main-nav').classList.toggle('open');
             this.classList.toggle('active');
         });
-        document.querySelectorAll('#main-nav a').forEach(link => {
-            link.addEventListener('click', () => {
+        document.querySelectorAll('#main-nav a').forEach(function(link) {
+            link.addEventListener('click', function() {
                 document.getElementById('main-nav').classList.remove('open');
                 document.getElementById('hamburger').classList.remove('active');
             });
