@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Page Loader -->
+<div id="page-loader">
+    <div class="loader-logo">Demo <span>Concessionaria</span></div>
+    <div class="loader-bar"></div>
+</div>
+<script>
+(function(){
+    var loader = document.getElementById('page-loader');
+    if(!loader) return;
+    function hide(){
+        loader.style.opacity='0';
+        loader.style.pointerEvents='none';
+        loader.style.transition='opacity 0.5s ease';
+        setTimeout(function(){ loader.remove(); }, 600);
+    }
+    setTimeout(hide, 1400);
+})();
+</script>
+
     <header>
         <div class="container">
             <a href="/" class="logo-link"><h1>Demo Concessionaria</h1></a>
@@ -21,65 +41,74 @@
         </div>
     </header>
 
+    <!-- Hero Contatti -->
+    <section class="contatti-hero">
+        <canvas id="contatti-canvas"></canvas>
+        <div class="hero-bg-gradient"></div>
+        <span class="hero-eyebrow">Siamo a tua disposizione</span>
+        <h2>Contattaci<em></em></h2>
+        <p>Vieni a trovarci o scrivici per qualsiasi informazione</p>
+    </section>
+
     <main class="container">
         <section class="contatti-section" id="contatti">
-            <div class="container">
-                <h2 class="section-title">Dove Siamo</h2>
-                <div class="contatti-grid">
-                    <div class="contatti-info">
-                        <div class="contatti-card">
-                            <div class="contatto-item">
-                                <span class="contatto-icon">📍</span>
-                                <div>
-                                    <span class="contatto-label">Indirizzo</span>
-                                    <span class="contatto-value">Via Porto Torres, 95<br>70026 Modugno – Bari (BA)</span>
-                                </div>
+            <div class="contatti-grid">
+                <!-- Info Card -->
+                <div class="contatti-info reveal">
+                    <div class="contatti-card">
+                        <div class="contatto-item reveal reveal-delay-1">
+                            <span class="contatto-icon">📍</span>
+                            <div>
+                                <span class="contatto-label">Indirizzo</span>
+                                <span class="contatto-value">Via Porto Torres, 95<br>70026 Modugno – Bari (BA)</span>
                             </div>
-                            <div class="contatto-item">
-                                <span class="contatto-icon">📞</span>
-                                <div>
-                                    <span class="contatto-label">Telefono</span>
-                                    <a href="tel:+390801234567" class="contatto-value contatto-link">+39 080 123 4567</a>
-                                </div>
-                            </div>
-                            <div class="contatto-item">
-                                <span class="contatto-icon">📱</span>
-                                <div>
-                                    <span class="contatto-label">WhatsApp</span>
-                                    <a href="https://wa.me/390801234567" target="_blank" class="contatto-value contatto-link">+39 080 123 4567</a>
-                                </div>
-                            </div>
-                            <div class="contatto-item">
-                                <span class="contatto-icon">✉️</span>
-                                <div>
-                                    <span class="contatto-label">Email</span>
-                                    <a href="mailto:info@concessionario.it" class="contatto-value contatto-link">info@concessionario.it</a>
-                                </div>
-                            </div>
-                            <div class="contatto-item">
-                                <span class="contatto-icon">🕐</span>
-                                <div>
-                                    <span class="contatto-label">Orari</span>
-                                    <span class="contatto-value">Lun – Sab: 9:00 – 19:00<br>Domenica: Chiuso</span>
-                                </div>
-                            </div>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Via+Porto+Torres,+95,+70026+Modugno+BA" target="_blank" class="btn-maps">
-                                🗺️ Apri in Google Maps
-                            </a>
                         </div>
+                        <div class="contatto-item reveal reveal-delay-2">
+                            <span class="contatto-icon">📞</span>
+                            <div>
+                                <span class="contatto-label">Telefono</span>
+                                <a href="tel:+390801234567" class="contatto-value contatto-link">+39 080 123 4567</a>
+                            </div>
+                        </div>
+                        <div class="contatto-item reveal reveal-delay-3">
+                            <span class="contatto-icon">📱</span>
+                            <div>
+                                <span class="contatto-label">WhatsApp</span>
+                                <a href="https://wa.me/390801234567" target="_blank" class="contatto-value contatto-link">+39 080 123 4567</a>
+                            </div>
+                        </div>
+                        <div class="contatto-item reveal reveal-delay-4">
+                            <span class="contatto-icon">✉️</span>
+                            <div>
+                                <span class="contatto-label">Email</span>
+                                <a href="mailto:info@concessionario.it" class="contatto-value contatto-link">info@concessionario.it</a>
+                            </div>
+                        </div>
+                        <div class="contatto-item reveal">
+                            <span class="contatto-icon">🕐</span>
+                            <div>
+                                <span class="contatto-label">Orari</span>
+                                <span class="contatto-value">Lun – Sab: 9:00 – 19:00<br>Domenica: Chiuso</span>
+                            </div>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Via+Porto+Torres,+95,+70026+Modugno+BA" target="_blank" class="btn-maps reveal">
+                            🗺️ Apri in Google Maps
+                        </a>
                     </div>
-                    <div class="contatti-mappa">
-                        <iframe
-                            src="https://maps.google.com/maps?q=Via+Porto+Torres,+95,+70026+Modugno+BA,+Italy&output=embed&z=16"
-                            width="100%"
-                            height="100%"
-                            style="border:0;"
-                            allowfullscreen=""
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            title="Mappa Concessionario">
-                        </iframe>
-                    </div>
+                </div>
+
+                <!-- Mappa -->
+                <div class="contatti-mappa reveal reveal-delay-2">
+                    <iframe
+                        src="https://maps.google.com/maps?q=Via+Porto+Torres,+95,+70026+Modugno+BA,+Italy&output=embed&z=16"
+                        width="100%"
+                        height="100%"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Mappa Concessionario">
+                    </iframe>
                 </div>
             </div>
         </section>
@@ -92,46 +121,26 @@
     </footer>
 
     <script>
-        function getAuthToken() {
-            return localStorage.getItem('authToken');
-        }
-
-        function getUserInfo() {
-            const userInfo = localStorage.getItem('userInfo');
-            return userInfo ? JSON.parse(userInfo) : null;
-        }
-
-        function isUserAdmin() {
-            const userInfo = getUserInfo();
-            return userInfo && userInfo.role === 'admin' && getAuthToken();
-        }
-
-        function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userInfo');
-            window.location.reload();
-        }
-
+        // ─── AUTH ────────────────────────────────────────────────────
+        function getAuthToken() { return localStorage.getItem('authToken'); }
+        function getUserInfo() { const u = localStorage.getItem('userInfo'); return u ? JSON.parse(u) : null; }
+        function isUserAdmin() { const u = getUserInfo(); return u && u.role === 'admin' && getAuthToken(); }
+        function logout() { localStorage.removeItem('authToken'); localStorage.removeItem('userInfo'); window.location.reload(); }
         function aggiornaAuth() {
             const authBtn = document.getElementById('auth-btn');
             if (isUserAdmin()) {
                 authBtn.textContent = 'Logout';
                 authBtn.href = '#';
-                authBtn.onclick = (e) => {
-                    e.preventDefault();
-                    logout();
-                };
+                authBtn.onclick = (e) => { e.preventDefault(); logout(); };
             } else {
                 authBtn.textContent = 'Accesso Admin';
                 authBtn.href = '/login';
                 authBtn.onclick = null;
             }
         }
-
         aggiornaAuth();
-    </script>
 
-    <script>
+        // ─── HAMBURGER ───────────────────────────────────────────────
         document.getElementById('hamburger').addEventListener('click', function() {
             document.getElementById('main-nav').classList.toggle('open');
             this.classList.toggle('active');
@@ -142,6 +151,72 @@
                 document.getElementById('hamburger').classList.remove('active');
             });
         });
+
+        // ─── HEADER SCROLL ───────────────────────────────────────────
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (header) header.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        // ─── SCROLL REVEAL ───────────────────────────────────────────
+        const revealObs = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
+
+        // ─── CANVAS PARTICLES ────────────────────────────────────────
+        (function() {
+            const canvas = document.getElementById('contatti-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+
+            const N = 45;
+            const particles = Array.from({ length: N }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.5 + 0.4,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                alpha: Math.random() * 0.4 + 0.12
+            }));
+
+            function draw() {
+                if (!canvas.width || !canvas.height) { requestAnimationFrame(draw); return; }
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(201,169,97,${0.1 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                    const p = particles[i];
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201,169,97,${p.alpha})`;
+                    ctx.fill();
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
     </script>
 </body>
 </html>
