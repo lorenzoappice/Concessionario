@@ -17,11 +17,11 @@ if (process.env.DATABASE_URL) {
 } else {
     // Connessione tramite variabili singole (sviluppo locale)
     poolConfig = {
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME || 'concessionario_db',
+        host: (process.env.DB_HOST || 'localhost').trim(),
+        port: parseInt(process.env.DB_PORT) || 5432,
+        user: (process.env.DB_USER || 'postgres').trim(),
+        password: (process.env.DB_PASSWORD || '').trim(),
+        database: (process.env.DB_NAME || 'concessionario_db').trim(),
         ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
         max: 20,
         idleTimeoutMillis: 30000,
