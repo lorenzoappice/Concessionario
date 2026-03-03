@@ -1375,6 +1375,39 @@ footer p {
     border-width: 3px;
 }
 
+/* Tag condizione e tipo veicolo nelle card */
+.veicolo-tags {
+    display: flex;
+    gap: 6px;
+    margin: 4px 0 8px;
+    flex-wrap: wrap;
+}
+.tag-condizione, .tag-tipo {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid currentColor;
+}
+.tag-nuovo {
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+.tag-usato {
+    color: var(--text-gray);
+    border-color: var(--text-gray);
+}
+.tag-km0 {
+    color: #3498db;
+    border-color: #3498db;
+}
+.tag-tipo {
+    color: var(--accent-gold);
+    border-color: var(--accent-gold);
+}
+
 /* Bottone fullscreen sulla foto principale */
 .gallery-fullscreen-btn {
     position: absolute;

@@ -109,6 +109,27 @@
                     </select>
                 </div>
 
+                <!-- Condizione -->
+                <div class="filtro-group">
+                    <label>Condizione</label>
+                    <select id="condizione">
+                        <option value="">Tutte</option>
+                        <option value="Nuovo">Nuovo</option>
+                        <option value="Usato">Usato</option>
+                        <option value="Km0">Km0</option>
+                    </select>
+                </div>
+
+                <!-- Tipo Veicolo -->
+                <div class="filtro-group">
+                    <label>Tipo Veicolo</label>
+                    <select id="tipo_veicolo">
+                        <option value="">Tutti</option>
+                        <option value="Auto">Auto</option>
+                        <option value="Scooter">Scooter</option>
+                    </select>
+                </div>
+
                 <!-- Ordinamento -->
                 <div class="filtro-group">
                     <label>Ordina per</label>
@@ -240,6 +261,86 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Condizione *</label>
+                        <select name="condizione" required>
+                            <option value="Usato">Usato</option>
+                            <option value="Nuovo">Nuovo</option>
+                            <option value="Km0">Km0</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo Veicolo *</label>
+                        <select name="tipo_veicolo" required>
+                            <option value="Auto">Auto</option>
+                            <option value="Scooter">Scooter</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Garanzia</label>
+                        <input type="text" name="garanzia" placeholder="es. 12 mesi">
+                    </div>
+                    <div class="form-group">
+                        <label>Neopatentati</label>
+                        <select name="neopatentati">
+                            <option value="No">No</option>
+                            <option value="Sì">Sì</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ultimo Tagliando</label>
+                        <input type="text" name="ultimo_tagliando" placeholder="es. 2024">
+                    </div>
+                    <div class="form-group">
+                        <label>N° Proprietari</label>
+                        <input type="number" name="proprietari" min="0" value="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marce</label>
+                        <input type="number" name="marce" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Cilindri</label>
+                        <input type="number" name="cilindri" min="1" max="16">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Peso a Vuoto (kg)</label>
+                        <input type="number" name="peso_vuoto" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Classe Emissioni</label>
+                        <select name="classe_emissioni">
+                            <option value="">Seleziona...</option>
+                            <option value="Euro 6">Euro 6</option>
+                            <option value="Euro 5">Euro 5</option>
+                            <option value="Euro 4">Euro 4</option>
+                            <option value="Euro 3">Euro 3</option>
+                            <option value="Euro 2">Euro 2</option>
+                            <option value="Elettrico">Elettrico (0 emissioni)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Consumi</label>
+                        <input type="text" name="consumi" placeholder="es. 6.5 L/100km">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Descrizione *</label>
                     <textarea name="descrizione" rows="4" required></textarea>
@@ -360,6 +461,86 @@
                     <div class="form-group">
                         <label>Trazione *</label>
                         <input type="text" name="trazione" id="modifica-trazione" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Condizione *</label>
+                        <select name="condizione" id="modifica-condizione" required>
+                            <option value="Usato">Usato</option>
+                            <option value="Nuovo">Nuovo</option>
+                            <option value="Km0">Km0</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo Veicolo *</label>
+                        <select name="tipo_veicolo" id="modifica-tipo_veicolo" required>
+                            <option value="Auto">Auto</option>
+                            <option value="Scooter">Scooter</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Garanzia</label>
+                        <input type="text" name="garanzia" id="modifica-garanzia" placeholder="es. 12 mesi">
+                    </div>
+                    <div class="form-group">
+                        <label>Neopatentati</label>
+                        <select name="neopatentati" id="modifica-neopatentati">
+                            <option value="No">No</option>
+                            <option value="Sì">Sì</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ultimo Tagliando</label>
+                        <input type="text" name="ultimo_tagliando" id="modifica-ultimo_tagliando" placeholder="es. 2024">
+                    </div>
+                    <div class="form-group">
+                        <label>N° Proprietari</label>
+                        <input type="number" name="proprietari" id="modifica-proprietari" min="0" value="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marce</label>
+                        <input type="number" name="marce" id="modifica-marce" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Cilindri</label>
+                        <input type="number" name="cilindri" id="modifica-cilindri" min="1" max="16">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Peso a Vuoto (kg)</label>
+                        <input type="number" name="peso_vuoto" id="modifica-peso_vuoto" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Classe Emissioni</label>
+                        <select name="classe_emissioni" id="modifica-classe_emissioni">
+                            <option value="">Seleziona...</option>
+                            <option value="Euro 6">Euro 6</option>
+                            <option value="Euro 5">Euro 5</option>
+                            <option value="Euro 4">Euro 4</option>
+                            <option value="Euro 3">Euro 3</option>
+                            <option value="Euro 2">Euro 2</option>
+                            <option value="Elettrico">Elettrico (0 emissioni)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Consumi</label>
+                        <input type="text" name="consumi" id="modifica-consumi" placeholder="es. 6.5 L/100km">
                     </div>
                 </div>
 
@@ -599,6 +780,17 @@
                 document.getElementById('modifica-posti').value = veicolo.posti;
                 document.getElementById('modifica-carrozzeria').value = veicolo.carrozzeria;
                 document.getElementById('modifica-trazione').value = veicolo.trazione;
+                document.getElementById('modifica-condizione').value = veicolo.condizione || 'Usato';
+                document.getElementById('modifica-tipo_veicolo').value = veicolo.tipo_veicolo || 'Auto';
+                document.getElementById('modifica-garanzia').value = veicolo.garanzia || '';
+                document.getElementById('modifica-neopatentati').value = veicolo.neopatentati || 'No';
+                document.getElementById('modifica-ultimo_tagliando').value = veicolo.ultimo_tagliando || '';
+                document.getElementById('modifica-proprietari').value = veicolo.proprietari || 0;
+                document.getElementById('modifica-marce').value = veicolo.marce || '';
+                document.getElementById('modifica-cilindri').value = veicolo.cilindri || '';
+                document.getElementById('modifica-peso_vuoto').value = veicolo.peso_vuoto || '';
+                document.getElementById('modifica-classe_emissioni').value = veicolo.classe_emissioni || '';
+                document.getElementById('modifica-consumi').value = veicolo.consumi || '';
                 document.getElementById('modifica-descrizione').value = veicolo.descrizione;
                 document.getElementById('modifica-optional').value = veicolo.optional ? veicolo.optional.join('\n') : '';
 
@@ -816,6 +1008,10 @@
                                     <span class="spec-badge">${veicolo.potenza} CV</span>
                                 </div>
                                 <p class="carburante-cambio">${veicolo.carburante} • ${veicolo.cambio}</p>
+                                <div class="veicolo-tags">
+                                    <span class="tag-condizione tag-${(veicolo.condizione || 'Usato').toLowerCase()}">${veicolo.condizione || 'Usato'}</span>
+                                    ${(veicolo.tipo_veicolo || 'Auto') !== 'Auto' ? `<span class="tag-tipo">${veicolo.tipo_veicolo}</span>` : ''}
+                                </div>
                                 <p class="prezzo">€ ${veicolo.prezzo.toLocaleString()}</p>
                                 <span class="btn-dettagli">Vedi dettagli →</span>
                             </div>
@@ -946,7 +1142,9 @@
                 kmMin: document.getElementById('kmMin').value,
                 kmMax: document.getElementById('kmMax').value,
                 carburante: document.getElementById('carburante').value,
-                cambio: document.getElementById('cambio').value
+                cambio: document.getElementById('cambio').value,
+                condizione: document.getElementById('condizione').value,
+                tipo_veicolo: document.getElementById('tipo_veicolo').value
             };
             const orderValue = document.getElementById('orderBy').value.split('-');
             if (orderValue.length === 2) {

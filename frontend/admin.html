@@ -117,6 +117,86 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="condizione">Condizione *</label>
+                        <select id="condizione" name="condizione" required>
+                            <option value="Usato">Usato</option>
+                            <option value="Nuovo">Nuovo</option>
+                            <option value="Km0">Km0</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo_veicolo">Tipo Veicolo *</label>
+                        <select id="tipo_veicolo" name="tipo_veicolo" required>
+                            <option value="Auto">Auto</option>
+                            <option value="Scooter">Scooter</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="garanzia">Garanzia</label>
+                        <input type="text" id="garanzia" name="garanzia" placeholder="es. 12 mesi">
+                    </div>
+                    <div class="form-group">
+                        <label for="neopatentati">Neopatentati</label>
+                        <select id="neopatentati" name="neopatentati">
+                            <option value="No">No</option>
+                            <option value="Sì">Sì</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ultimo_tagliando">Ultimo Tagliando</label>
+                        <input type="text" id="ultimo_tagliando" name="ultimo_tagliando" placeholder="es. 2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="proprietari">N° Proprietari</label>
+                        <input type="number" id="proprietari" name="proprietari" min="0" value="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="marce">Marce</label>
+                        <input type="number" id="marce" name="marce" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="cilindri">Cilindri</label>
+                        <input type="number" id="cilindri" name="cilindri" min="1" max="16">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="peso_vuoto">Peso a Vuoto (kg)</label>
+                        <input type="number" id="peso_vuoto" name="peso_vuoto" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="classe_emissioni">Classe Emissioni</label>
+                        <select id="classe_emissioni" name="classe_emissioni">
+                            <option value="">Seleziona...</option>
+                            <option value="Euro 6">Euro 6</option>
+                            <option value="Euro 5">Euro 5</option>
+                            <option value="Euro 4">Euro 4</option>
+                            <option value="Euro 3">Euro 3</option>
+                            <option value="Euro 2">Euro 2</option>
+                            <option value="Elettrico">Elettrico (0 emissioni)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="consumi">Consumi</label>
+                        <input type="text" id="consumi" name="consumi" placeholder="es. 6.5 L/100km">
+                    </div>
+                </div>
                 
                 <div class="form-row">
                     <div class="form-group">

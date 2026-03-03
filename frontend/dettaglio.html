@@ -151,6 +151,50 @@
                                             <span class="info-label">Carrozzeria</span>
                                             <span class="info-value">${veicolo.carrozzeria}</span>
                                         </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Condizione</span>
+                                            <span class="info-value">${veicolo.condizione || 'Usato'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Tipo Veicolo</span>
+                                            <span class="info-value">${veicolo.tipo_veicolo || 'Auto'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Garanzia</span>
+                                            <span class="info-value">${veicolo.garanzia || '-'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Neopatentati</span>
+                                            <span class="info-value">${veicolo.neopatentati || 'No'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Ultimo Tagliando</span>
+                                            <span class="info-value">${veicolo.ultimo_tagliando || '-'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Proprietari</span>
+                                            <span class="info-value">${veicolo.proprietari !== null && veicolo.proprietari !== undefined ? veicolo.proprietari : 0}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Marce</span>
+                                            <span class="info-value">${veicolo.marce || '-'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Cilindri</span>
+                                            <span class="info-value">${veicolo.cilindri || '-'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Peso a Vuoto</span>
+                                            <span class="info-value">${veicolo.peso_vuoto ? veicolo.peso_vuoto + ' kg' : '-'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Classe Emissioni</span>
+                                            <span class="info-value">${veicolo.classe_emissioni || '-'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Consumi</span>
+                                            <span class="info-value">${veicolo.consumi || '-'}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

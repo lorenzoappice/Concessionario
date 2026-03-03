@@ -390,8 +390,9 @@ app.post('/api/veicoli', authenticateToken, isAdmin, upload.array('immagini', 10
     // Inserisci veicolo
     const vehicleResult = await client.query(
       `INSERT INTO vehicles (marca, modello, anno, prezzo, chilometri, potenza, cilindrata, 
-       carburante, cambio, colore, porte, posti, carrozzeria, trazione, descrizione, condizione, tipo_veicolo)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+       carburante, cambio, colore, porte, posti, carrozzeria, trazione, descrizione, condizione, tipo_veicolo,
+       garanzia, neopatentati, ultimo_tagliando, proprietari, marce, cilindri, peso_vuoto, classe_emissioni, consumi)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
        RETURNING *`,
       [
         req.body.marca, req.body.modello, parseInt(req.body.anno), 
@@ -400,7 +401,14 @@ app.post('/api/veicoli', authenticateToken, isAdmin, upload.array('immagini', 10
         req.body.cambio, req.body.colore, parseInt(req.body.porte),
         parseInt(req.body.posti), req.body.carrozzeria, req.body.trazione,
         req.body.descrizione,
-        req.body.condizione || 'Usato', req.body.tipo_veicolo || 'Auto'
+        req.body.condizione || 'Usato', req.body.tipo_veicolo || 'Auto',
+        req.body.garanzia || null, req.body.neopatentati || 'No',
+        req.body.ultimo_tagliando || null,
+        req.body.proprietari ? parseInt(req.body.proprietari) : 0,
+        req.body.marce ? parseInt(req.body.marce) : null,
+        req.body.cilindri ? parseInt(req.body.cilindri) : null,
+        req.body.peso_vuoto ? parseInt(req.body.peso_vuoto) : null,
+        req.body.classe_emissioni || null, req.body.consumi || null
       ]
     );
     
@@ -504,8 +512,11 @@ app.put('/api/veicoli/:id', authenticateToken, isAdmin, upload.array('immagini',
        marca = $1, modello = $2, anno = $3, prezzo = $4, chilometri = $5, 
        potenza = $6, cilindrata = $7, carburante = $8, cambio = $9, colore = $10,
        porte = $11, posti = $12, carrozzeria = $13, trazione = $14, descrizione = $15,
-       condizione = $16, tipo_veicolo = $17
-       WHERE id = $18`,
+       condizione = $16, tipo_veicolo = $17,
+       garanzia = $18, neopatentati = $19, ultimo_tagliando = $20,
+       proprietari = $21, marce = $22, cilindri = $23,
+       peso_vuoto = $24, classe_emissioni = $25, consumi = $26
+       WHERE id = $27`,
       [
         req.body.marca, req.body.modello, parseInt(req.body.anno), 
         parseFloat(req.body.prezzo), parseInt(req.body.chilometri),
@@ -513,7 +524,15 @@ app.put('/api/veicoli/:id', authenticateToken, isAdmin, upload.array('immagini',
         req.body.cambio, req.body.colore, parseInt(req.body.porte),
         parseInt(req.body.posti), req.body.carrozzeria, req.body.trazione,
         req.body.descrizione,
-        req.body.condizione || 'Usato', req.body.tipo_veicolo || 'Auto', id
+        req.body.condizione || 'Usato', req.body.tipo_veicolo || 'Auto',
+        req.body.garanzia || null, req.body.neopatentati || 'No',
+        req.body.ultimo_tagliando || null,
+        req.body.proprietari ? parseInt(req.body.proprietari) : 0,
+        req.body.marce ? parseInt(req.body.marce) : null,
+        req.body.cilindri ? parseInt(req.body.cilindri) : null,
+        req.body.peso_vuoto ? parseInt(req.body.peso_vuoto) : null,
+        req.body.classe_emissioni || null, req.body.consumi || null,
+        id
       ]
     );
     
@@ -689,6 +708,15 @@ async function initDatabase() {
         descrizione TEXT,
         condizione VARCHAR(20) DEFAULT 'Usato',
         tipo_veicolo VARCHAR(30) DEFAULT 'Auto',
+        garanzia VARCHAR(50),
+        neopatentati VARCHAR(2) DEFAULT 'No',
+        ultimo_tagliando VARCHAR(50),
+        proprietari INTEGER DEFAULT 0,
+        marce INTEGER,
+        cilindri INTEGER,
+        peso_vuoto INTEGER,
+        classe_emissioni VARCHAR(20),
+        consumi VARCHAR(50),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -718,6 +746,15 @@ async function initDatabase() {
     // Aggiunge colonne se non esistono (per DB già creati)
     await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS condizione VARCHAR(20) DEFAULT 'Usato'`);
     await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS tipo_veicolo VARCHAR(30) DEFAULT 'Auto'`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS garanzia VARCHAR(50)`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS neopatentati VARCHAR(2) DEFAULT 'No'`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS ultimo_tagliando VARCHAR(50)`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS proprietari INTEGER DEFAULT 0`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS marce INTEGER`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS cilindri INTEGER`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS peso_vuoto INTEGER`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS classe_emissioni VARCHAR(20)`);
+    await query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS consumi VARCHAR(50)`);
 
     await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_marca ON vehicles(marca);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_prezzo ON vehicles(prezzo);`);
