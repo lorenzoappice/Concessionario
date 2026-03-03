@@ -604,10 +604,94 @@ app.get('/confronta', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/confronta.html'));
 });
 
+// ==================== AUTO-INIT DATABASE ====================
+
+async function initDatabase() {
+  try {
+    console.log('⏳ Inizializzazione database...');
+
+    // Crea tabelle se non esistono
+    await query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(20) DEFAULT 'admin',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS vehicles (
+        id SERIAL PRIMARY KEY,
+        marca VARCHAR(50) NOT NULL,
+        modello VARCHAR(100) NOT NULL,
+        anno INTEGER NOT NULL,
+        prezzo DECIMAL(10, 2) NOT NULL,
+        chilometri INTEGER NOT NULL,
+        potenza VARCHAR(20),
+        cilindrata VARCHAR(20),
+        carburante VARCHAR(30),
+        cambio VARCHAR(30),
+        colore VARCHAR(30),
+        porte INTEGER,
+        posti INTEGER,
+        carrozzeria VARCHAR(50),
+        trazione VARCHAR(30),
+        descrizione TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS vehicle_images (
+        id SERIAL PRIMARY KEY,
+        vehicle_id INTEGER NOT NULL,
+        image_path VARCHAR(255) NOT NULL,
+        image_order INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+      );
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS vehicle_optionals (
+        id SERIAL PRIMARY KEY,
+        vehicle_id INTEGER NOT NULL,
+        optional_name VARCHAR(255) NOT NULL,
+        FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+      );
+    `);
+
+    // Crea indici
+    await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_marca ON vehicles(marca);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_prezzo ON vehicles(prezzo);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_vehicles_anno ON vehicles(anno);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_vehicle_images_vehicle_id ON vehicle_images(vehicle_id);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_vehicle_optionals_vehicle_id ON vehicle_optionals(vehicle_id);`);
+
+    // Crea utente admin di default se non esiste
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await query(
+      'INSERT INTO users (username, password, role) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING',
+      ['admin', hashedPassword, 'admin']
+    );
+
+    console.log('✅ Database inizializzato correttamente');
+    console.log(`👤 Admin: username=admin, password=${adminPassword}`);
+  } catch (error) {
+    console.error('❌ Errore inizializzazione database:', error.message);
+    // Non blocca il server, ma logga l'errore
+  }
+}
+
 // ==================== START SERVER ====================
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\n🚀 Server in esecuzione su http://localhost:${PORT}`);
   console.log(`📊 Database: PostgreSQL`);
   console.log(`🔐 JWT Authentication attivo\n`);
+  await initDatabase();
 });

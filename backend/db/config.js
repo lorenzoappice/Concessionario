@@ -2,18 +2,34 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 // Configurazione pool PostgreSQL
-const pool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME || 'concessionario_db',
-    // SSL per database cloud (Neon, Supabase, Render, etc.)
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-    max: 20, // massimo numero di connessioni nel pool
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-});
+// Supporta DATABASE_URL (Neon, Railway, Heroku, ecc.) oppure variabili singole
+let poolConfig;
+
+if (process.env.DATABASE_URL) {
+    // Connessione tramite connection string (formato Neon/Railway)
+    poolConfig = {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }, // Richiesto da Neon
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+    };
+} else {
+    // Connessione tramite variabili singole (sviluppo locale)
+    poolConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5432,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME || 'concessionario_db',
+        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+    };
+}
+
+const pool = new Pool(poolConfig);
 
 // Test connessione
 pool.on('connect', () => {
